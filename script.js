@@ -9,6 +9,22 @@ function drawBackground() {
   ctx.fillStyle = "#87CEEB"; // Himmelblau
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
+// initialisiere sprite sheet
+const player1SpriteSheet = new Image();
+player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png"; 
+
+const player2SpriteSheet = new Image();
+player2SpriteSheet.src ="assets\sprites\BruteArms\Sprite_Sheet\BruteArm_Idle.png";
+// Animationseinstellungen
+const spriteConfig = {
+    frameWidth: 100, // Width of each frame in the sprite sheet
+    frameHeight: 100, // Height of each frame in the sprite sheet
+    animationSpeed: 100, // Time (ms) per frame
+    player1Frame: 0, // Current frame for Player 1
+    player2Frame: 0, // Current frame for Player 2
+    totalFrames: 8, // Total frames in the sprite sheet
+    frameTimer: 0, // Timer to track animation updates
+  };
 
 // Charakter-Objekte
 const player1 = {
@@ -49,16 +65,48 @@ const player2 = {
   damageAttack2: 10,
 };
 
-// Spieler zeichnen
-function drawPlayer(player) {
-  ctx.fillStyle = player.color;
-  ctx.fillRect(player.x, player.y, player.width, player.height);
-  if (player.action === 'block') {
-    ctx.fillStyle = 'yellow'; 
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-}
-}
+// Spieler zeichnen (mit Animation)
+function drawPlayer(player, sprite, currentFrame) {
+    ctx.drawImage(
+      sprite, // The sprite sheet
+      currentFrame * spriteConfig.frameWidth, // Source X (current frame)
+      0, // Source Y (first row only)
+      spriteConfig.frameWidth, // Frame width
+      spriteConfig.frameHeight, // Frame height
+      player.x, // Destination X
+      player.y, // Destination Y
+      player.width, // Drawn width
+      player.height // Drawn height
+    );
+  }
+  
+  function updateAnimationFrames() {
+    // spriteConfig.frameTimer += deltaTime;
 
+    // if (spriteConfig.frameTimer >= spriteConfig.animationSpeed) {
+    //   // Increment frames for both players
+    //   spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % spriteConfig.totalFrames;
+    //   spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % spriteConfig.totalFrames;
+  
+    //   // Reset timer
+    //   spriteConfig.frameTimer = 0;
+    // }
+    if (player1.action === "jump") {
+      spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // Nur 4 Frames für Sprung
+    } else if (player1.action === "attack1") {
+      spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 6; // 6 Frames für Angriff
+    } else {
+      spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 3; // Standardlauf (3 Frames)
+    }
+  
+    if (player2.action === "jump") {
+      spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 4;
+    } else if (player2.action === "attack1") {
+      spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 6;
+    } else {
+      spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 3;
+    }
+  }
 // Tastenverwaltung
 const keys = {};
 
@@ -274,8 +322,9 @@ function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
   handleAnimations();
-  drawPlayer(player1);
-  drawPlayer(player2);
+  drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
+  drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
+  updateAnimationFrames();
   drawHitbox(player1);
   drawHitbox(player2);
   updateHitbox(player1);
