@@ -149,6 +149,36 @@ function handleAnimations() {
     }
 }
 
+//kollision
+// Beispiel für Treffer-Logik
+function handleCollisions() {
+    if ((player1.action === 'attack' || player1.action === 'attack2') && player1.x + player1.width > player2.x && player1.x < player2.x + player2.width && player1.y + player1.height > player2.y) {
+        player2.health -= 10;
+        if (player2.health <= 0) player2.health = 0;
+    }
+
+    if ((player2.action === 'attack' || player2.action === 'attack2') && player2.x + player2.width > player1.x && player2.x < player1.x + player1.width && player2.y + player2.height > player1.y) {
+        player1.health -= 10;
+        if (player1.health <= 0) player1.health = 0;
+    }
+}
+
+//gesundheitsbalken aktualisieren
+// Beispiel für Health Balken Update
+function updateHealth() {
+    const player1HealthBar = document.getElementById('player1-health');
+    const player2HealthBar = document.getElementById('player2-health');
+    
+    // Update der Balkenbreite basierend auf der Gesundheit
+    player1HealthBar.style.width = `${player1.health}%`;
+    player2HealthBar.style.width = `${player2.health}%`;
+}
+
+// Aufruf in der gameLoop()
+updateHealth();
+
+
+
 // Aktion zurücksetzen
 function resetAction(player, delay) {
     setTimeout(() => {
@@ -163,6 +193,7 @@ function gameLoop() {
     handleAnimations(); // Aktionen aktualisieren
     drawPlayer(player1);
     drawPlayer(player2);
+    handleCollisions();
     update();
     requestAnimationFrame(gameLoop);
 }
