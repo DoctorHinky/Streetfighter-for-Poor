@@ -22,7 +22,8 @@ const player1 = {
     isJumping: false, // check for jump
     jumpStrength: -15, 
     gravity: 0.8, 
-    action: null, 
+    action: null,
+    health: 300
 };
 
 const player2 = {
@@ -37,6 +38,7 @@ const player2 = {
     jumpStrength: -10,
     gravity: 0.8,
     action: null,
+    health: 300
 };
 
 // Spieler zeichnen
