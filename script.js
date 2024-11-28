@@ -53,6 +53,10 @@ const player2 = {
 function drawPlayer(player) {
   ctx.fillStyle = player.color;
   ctx.fillRect(player.x, player.y, player.width, player.height);
+  if (player.action === 'block') {
+    ctx.fillStyle = 'yellow'; 
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+}
 }
 
 // Tastenverwaltung
@@ -167,6 +171,10 @@ function handleAnimations() {
       player1.canAttack = true;
     }, 500);
   }
+  if (keys['s']) {
+    player1.action = 'block';
+    resetAction(player1, 300);
+}
 
   // Aktionen für Spieler 2
   if (keys["1"] && player2.canAttack) {
@@ -186,6 +194,10 @@ function handleAnimations() {
       player2.canAttack = true;
     }, 500);
   }
+  if (keys['ArrowDown']) {
+    player2.action = 'block';
+    resetAction(player2, 300);
+}
 }
 
 // Kollision mit Hitbox
