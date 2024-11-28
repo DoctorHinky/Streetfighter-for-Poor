@@ -22,7 +22,8 @@ const player1 = {
     isJumping: false, // check for jump
     jumpStrength: -15, 
     gravity: 0.8, 
-    action: null, 
+    action: null,
+    health: 300
 };
 
 const player2 = {
@@ -37,6 +38,7 @@ const player2 = {
     jumpStrength: -10,
     gravity: 0.8,
     action: null,
+    health: 300
 };
 
 // Spieler zeichnen
@@ -149,10 +151,40 @@ function handleAnimations() {
     }
 }
 
+//kollision
+// Beispiel für Treffer-Logik
+function handleCollisions() {
+    if ((player1.action === 'attack' || player1.action === 'attack2') && player1.x + player1.width > player2.x && player1.x < player2.x + player2.width && player1.y + player1.height > player2.y) {
+        player2.health -= 10;
+        if (player2.health <= 0) player2.health = 0;
+    }
+
+    if ((player2.action === 'attack' || player2.action === 'attack2') && player2.x + player2.width > player1.x && player2.x < player1.x + player1.width && player2.y + player2.height > player1.y) {
+        player1.health -= 10;
+        if (player1.health <= 0) player1.health = 0;
+    }
+}
+
+//gesundheitsbalken aktualisieren
+// Beispiel für Health Balken Update
+function updateHealth() {
+    const player1HealthBar = document.getElementById('player1-health');
+    const player2HealthBar = document.getElementById('player2-health');
+    
+    // Update der Balkenbreite basierend auf der Gesundheit
+    player1HealthBar.style.width = `${player1.health}%`;
+    player2HealthBar.style.width = `${player2.health}%`;
+}
+
+// Aufruf in der gameLoop()
+updateHealth();
+
+
+
 // Aktion zurücksetzen
 function resetAction(player, delay) {
     setTimeout(() => {
-        player.action = null; // Aktion zurücksetzen
+        player.action = null;
     }, delay);
 }
 
@@ -163,6 +195,7 @@ function gameLoop() {
     handleAnimations(); // Aktionen aktualisieren
     drawPlayer(player1);
     drawPlayer(player2);
+    handleCollisions();
     update();
     requestAnimationFrame(gameLoop);
 }
@@ -172,6 +205,8 @@ gameLoop();
 {
     let timer = 120;
     const timerDisplay = document.getElementById('timer');
+    const div = timerDisplay.parentElement
+    
 
     if (timerDisplay) { // Vermeide Fehler, wenn das Element fehlt
         const timerInterval = setInterval(() => {
@@ -179,7 +214,14 @@ gameLoop();
                 timer--;
                 timerDisplay.textContent = timer;
             } else {
-                clearInterval(timerInterval);    
+                clearInterval(timerInterval);  
+                if(player1.health > player2.health){
+                    div.textContent = "PLAYER 1 WON!"
+                }else if(player2.health > player1.health){
+                    div.textContent = 'PLAYER 2 WON!';
+                }else{
+                    div.textContent = "TIME OVER IT'S A TIE!"
+                }
             }
         }, 1000);
     } else {
