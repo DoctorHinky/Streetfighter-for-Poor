@@ -48,14 +48,10 @@ window.addEventListener('keyup', (e) => {
 
 function update() {
     // movement player 1
-    if (keys['w']) player1.y -= player1.speed;
-    if (keys['s']) player1.y += player1.speed;
     if (keys['a']) player1.x -= player1.speed;
     if (keys['d']) player1.x += player1.speed;
 
     // movement player 2
-    if (keys['ArrowUp']) player2.y -= player2.speed;
-    if (keys['ArrowDown']) player2.y += player2.speed;
     if (keys['ArrowLeft']) player2.x -= player2.speed;
     if (keys['ArrowRight']) player2.x += player2.speed;
 
