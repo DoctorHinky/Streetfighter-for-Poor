@@ -103,7 +103,7 @@ function handleAnimations() {
     if (keys['2']) {
         player1.action = 'attack2';
     }
-    if (keys['arrowDown']) {
+    if (keys['ArrowDown']) {
         player2.action = 'block';
     }
     if (keys['ArrowUp']) {
