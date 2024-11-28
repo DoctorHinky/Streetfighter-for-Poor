@@ -39,7 +39,7 @@ const player2 = {
   speed: 5,
   velocityY: 0,
   isJumping: false,
-  jumpStrength: -10,
+  jumpStrength: -15,
   gravity: 0.8,
   action: null,
   health: 300,
@@ -233,8 +233,8 @@ function updateHitbox(player) {
     player.hitbox.height = 60;
   } else if (player.action === "attack2") {
     player.hitbox.active = true;
-    player.hitbox.x = player.x - 30;
-    player.hitbox.y = player.y + 10;
+    player.hitbox.x = player.x + player.width;
+    player.hitbox.y = player.y + 20;
     player.hitbox.width = 40;
     player.hitbox.height = 80;
   } else {
