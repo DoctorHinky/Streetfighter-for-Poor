@@ -179,8 +179,7 @@ gameLoop();
                 timer--;
                 timerDisplay.textContent = timer;
             } else {
-                clearInterval(timerInterval);
-                alert('Timer up');
+                clearInterval(timerInterval);    
             }
         }, 1000);
     } else {
