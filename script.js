@@ -1,17 +1,16 @@
-// initialyse canvas
+// Initialisiere Canvas
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 400;
 
-// draw game background
+// Hintergrund zeichnen
 function drawBackground() {
-    ctx.fillStyle = '#87CEEB'; // Skyblue
+    ctx.fillStyle = '#87CEEB'; // Himmelblau
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
-drawBackground();
 
-// character placeholder
+// Charakter-Objekte
 const player1 = {
     x: 100,
     y: 300,
@@ -19,6 +18,7 @@ const player1 = {
     height: 100,
     color: 'blue',
     speed: 5,
+    action: null, // Hinzugefügt: Initialzustand
 };
 
 const player2 = {
@@ -28,12 +28,11 @@ const player2 = {
     height: 100,
     color: 'green',
     speed: 5,
+    action: null, // Hinzugefügt: Initialzustand
 };
 
+// Spieler zeichnen
 function drawPlayer(player) {
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    // Player actions test animations
     if (player.action === 'jump') {
         ctx.fillStyle = player.color;
         ctx.fillRect(player.x, player.y - 50, player.width, player.height);
@@ -41,18 +40,15 @@ function drawPlayer(player) {
         ctx.fillStyle = player.color;
         ctx.fillRect(player.x + 20, player.y, player.width, player.height);
     } else if (player.action === 'block') {
-        ctx.fillStyle = 'yellow';
+        ctx.fillStyle = 'yellow'; // Block-Farbe
         ctx.fillRect(player.x, player.y, player.width, player.height);
     } else {
         ctx.fillStyle = player.color;
         ctx.fillRect(player.x, player.y, player.width, player.height);
     }
-
-    player.action = null; // Reset after animation
 }
 
-
-//character movement
+// Tastenverwaltung
 const keys = {};
 
 window.addEventListener('keydown', (e) => {
@@ -63,59 +59,64 @@ window.addEventListener('keyup', (e) => {
     keys[e.key] = false;
 });
 
+// Spieler aktualisieren
 function update() {
-    // movement player 1
+    // Bewegung für Spieler 1
     if (keys['a']) player1.x -= player1.speed;
     if (keys['d']) player1.x += player1.speed;
 
-    // movement player 2
+    // Bewegung für Spieler 2
     if (keys['ArrowLeft']) player2.x -= player2.speed;
     if (keys['ArrowRight']) player2.x += player2.speed;
 
-    // boundary check
+    // Begrenzungen
     player1.x = Math.max(0, Math.min(canvas.width - player1.width, player1.x));
-    player1.y = Math.max(0, Math.min(canvas.height - player1.height, player1.y));
-
     player2.x = Math.max(0, Math.min(canvas.width - player2.width, player2.x));
-    player2.y = Math.max(0, Math.min(canvas.height - player2.height, player2.y));
 }
 
-//player attacks
+// Aktionen verwalten
 function handleAnimations() {
-    // Player 1 actions
+    // Aktionen für Spieler 1
     if (keys['j']) {
         player1.action = 'attack';
-    }
-    if (keys['k']) {
-        player1.action = 'attack2';
-    }
-    if (keys['s']) {
-        player1.action = 'block';
+        resetAction(player1, 200); // Aktion nach 200ms zurücksetzen
     }
     if (keys['w']) {
         player1.action = 'jump';
+        resetAction(player1, 500);
+    }
+    if (keys['s']) {
+        player1.action = 'block';
+        resetAction(player1, 300);
     }
 
-    // Player 2 actions
+    // Aktionen für Spieler 2
     if (keys['1']) {
         player2.action = 'attack';
-    }
-    if (keys['2']) {
-        player1.action = 'attack2';
-    }
-    if (keys['arrowDown']) {
-        player2.action = 'block';
+        resetAction(player2, 200);
     }
     if (keys['ArrowUp']) {
         player2.action = 'jump';
+        resetAction(player2, 500);
+    }
+    if (keys['ArrowDown']) {
+        player2.action = 'block';
+        resetAction(player2, 300);
     }
 }
 
+// Aktion zurücksetzen
+function resetAction(player, delay) {
+    setTimeout(() => {
+        player.action = null; // Aktion zurücksetzen
+    }, delay);
+}
 
-// game loop
+// Spiel-Loop
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
+    handleAnimations(); // Aktionen aktualisieren
     drawPlayer(player1);
     drawPlayer(player2);
     update();
@@ -123,26 +124,22 @@ function gameLoop() {
 }
 gameLoop();
 
-
-// scope block, game timer
+// Timer
 {
     let timer = 120; 
     const timerDisplay = document.getElementById('timer');
 
-
-    function runningTimer() {
-        if (timer > 0) {
-            timer--; 
-            timerDisplay.textContent = timer;
-        } else {
-            clearInterval(timerInterval);
-            alert('Timer up');
-        }
+    if (timerDisplay) { // Vermeide Fehler, wenn das Element fehlt
+        const timerInterval = setInterval(() => {
+            if (timer > 0) {
+                timer--;
+                timerDisplay.textContent = timer;
+            } else {
+                clearInterval(timerInterval);
+                alert('Timer up');
+            }
+        }, 1000);
+    } else {
+        console.warn('Timer-Element nicht gefunden!');
     }
-
-    // show timer ingame
-    const timerInterval = setInterval(() => {
-        runningTimer();
-    }, 1000);
-
 }
