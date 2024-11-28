@@ -249,6 +249,9 @@ function updateHealth() {
 
 // Aktion zurücksetzen
 function resetAction(player, delay) {
+    setTimeout(() => {
+        player.action = null;
+    }, delay);
   setTimeout(() => {
     player.action = null;
   }, delay);
@@ -271,3 +274,31 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 gameLoop();
+
+
+{
+    let timer = 120;
+    const timerDisplay = document.getElementById('timer');
+    const div = timerDisplay.parentElement
+    
+
+    if (timerDisplay) { // Vermeide Fehler, wenn das Element fehlt
+        const timerInterval = setInterval(() => {
+            if (timer > 0) {
+                timer--;
+                timerDisplay.textContent = timer;
+            } else {
+                clearInterval(timerInterval);  
+                if(player1.health > player2.health){
+                    div.textContent = "PLAYER 1 WON!"
+                }else if(player2.health > player1.health){
+                    div.textContent = 'PLAYER 2 WON!';
+                }else{
+                    div.textContent = "TIME OVER IT'S A TIE!"
+                }
+            }
+        }, 1000);
+    } else {
+        console.warn('Timer-Element nicht gefunden!');
+    }
+}

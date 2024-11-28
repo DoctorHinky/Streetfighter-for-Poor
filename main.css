@@ -6,6 +6,8 @@ body {
     align-items: center;
     background-color: #000;
     height: 100vh;
+
+    font-family: monospace;
 }
 
 #game-container {
@@ -17,13 +19,23 @@ body {
     display: flex;
     justify-content: top;
     flex-direction: column;
+    box-shadow: 0px 0px 20px 4px skyblue;
+    font-size: 3rem;
+    animation: colorturn 1s steps(3) infinite;
+    color: white;
+    
+}
+
+@keyframes colorturn{
+    50%{
+        color: black;
+    }
 }
 
 #topbar {
     display: flex;
     top: 10px;
     position: relative;
-    color: white;
     height: 40px;
     margin: 0 auto;
     font-family: Arial, sans-serif;
@@ -33,22 +45,22 @@ body {
     border-radius: 50px;
     overflow: hidden;
     z-index: 10;
-    width: 500px;
+    min-width: 650px;
 }
 
 .player{
-    width: 400px;
     height: 100%;
     z-index: 100;
 }
 
 #player1-health{
     background: rgb(105,88,90);
-background: linear-gradient(90deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);
+    background: linear-gradient(90deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);
+    
 }
 #player2-health{
     background: rgb(105,88,90);
-background: linear-gradient(270deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);
+    background: linear-gradient(270deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);
 }
 
 
@@ -58,8 +70,10 @@ background: linear-gradient(270deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%)
     border: 2px white solid;
     border-radius: 5px;
     margin: 0 5px;
-    width: 50px;
+    min-width: 50px;
     text-align: center;
+    align-self: center;
+    color: white;
 }
 
 #game-canvas {
