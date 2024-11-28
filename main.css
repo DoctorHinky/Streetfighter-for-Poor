@@ -49,6 +49,8 @@ body {
     border: 2px white solid;
     border-radius: 5px;
     margin: 0 5px;
+    width: 50px;
+    text-align: center;
 }
 
 #game-canvas {
