@@ -33,7 +33,24 @@ const player2 = {
 function drawPlayer(player) {
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
+    // Player actions test animations
+    if (player.action === 'jump') {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y - 50, player.width, player.height);
+    } else if (player.action === 'attack') {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x + 20, player.y, player.width, player.height);
+    } else if (player.action === 'block') {
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    } else {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    player.action = null; // Reset after animation
 }
+
 
 //character movement
 const keys = {};
@@ -63,6 +80,39 @@ function update() {
     player2.y = Math.max(0, Math.min(canvas.height - player2.height, player2.y));
 }
 
+//player attacks
+function handleAnimations() {
+    // Player 1 actions
+    if (keys['j']) {
+        player1.action = 'attack';
+    }
+    if (keys['k']) {
+        player1.action = 'attack2';
+    }
+    if (keys['s']) {
+        player1.action = 'block';
+    }
+    if (keys['w']) {
+        player1.action = 'jump';
+    }
+
+    // Player 2 actions
+    if (keys['1']) {
+        player2.action = 'attack';
+    }
+    if (keys['2']) {
+        player1.action = 'attack2';
+    }
+    if (keys['arrowDown']) {
+        player2.action = 'block';
+    }
+    if (keys['ArrowUp']) {
+        player2.action = 'jump';
+    }
+}
+
+
+// game loop
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
