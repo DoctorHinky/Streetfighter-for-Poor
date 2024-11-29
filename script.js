@@ -15,7 +15,7 @@ const player1SpriteSheet = new Image();
 player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png"; 
 
 const player2SpriteSheet = new Image();
-player2SpriteSheet.src ="assets\sprites\BruteArms\Sprite_Sheet\BruteArm_Idle.png";
+player2SpriteSheet.src ="./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Idle.png";
 // Animationseinstellungen
 const spriteConfig = {
     frameWidth: 100, // Width of each frame in the sprite sheet
