@@ -37,9 +37,9 @@ player2Sprite.src = "sprites/player2.png"; // Pfad zum Bild für Spieler 2
 // Charakter-Objekte
 const player1 = {
   x: 100,
-  y: 300,
-  width: 50,
-  height: 100,
+  y: 190,
+  width: 200,
+  height: 200,
   color: "blue",
   speed: 5,
   velocityY: 0,
@@ -56,9 +56,9 @@ const player1 = {
 
 const player2 = {
   x: 600,
-  y: 300,
-  width: 50,
-  height: 100,
+  y: 190,
+  width: 200,
+  height: 200,
   color: "green",
   speed: 5,
   velocityY: 0,
