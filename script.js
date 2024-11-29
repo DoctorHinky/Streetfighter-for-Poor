@@ -4,18 +4,25 @@ const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 400;
 
-// Hintergrund zeichnen
-function drawBackground() {
-  const img = new Image();
-  img.src = './assets/background/Rusted_4.png';
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+const background = new Image();
+background.src = './assets/background/Rusted_4.webp'; 
+// Hintergrund zeichnen/async damit der background laden kann
+
+background.onload = () => {
+  drawBackground()
 }
+
+function drawBackground() {
+  ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
+}
+
 // initialisiere sprite sheet
 const player1SpriteSheet = new Image();
 player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png"; 
 
 const player2SpriteSheet = new Image();
 player2SpriteSheet.src ="./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Idle.png";
+
 // Animationseinstellungen
 const spriteConfig = {
     frameWidth: 100, // Width of each frame in the sprite sheet
@@ -27,17 +34,10 @@ const spriteConfig = {
     frameTimer: 0, // Timer to track animation updates
   };
 
-const player1Sprite = new Image();
-player1Sprite.src = "assets/sprites/Bancho/Sprite Sheets/Bancho_Idle-png"; // Pfad zum Bild für Spieler 1
-
-const player2Sprite = new Image();
-player2Sprite.src = "sprites/player2.png"; // Pfad zum Bild für Spieler 2
-
-
 // Charakter-Objekte
 const player1 = {
   x: 100,
-  y: 190,
+  y: 150,
   width: 200,
   height: 200,
   color: "blue",
@@ -56,14 +56,14 @@ const player1 = {
 
 const player2 = {
   x: 600,
-  y: 190,
+  y: 150,
   width: 200,
   height: 200,
   color: "green",
   speed: 5,
   velocityY: 0,
   isJumping: false,
-  jumpStrength: -15,
+  jumpStrength: -17,
   gravity: 0.8,
   action: null,
   health: 300,
@@ -72,6 +72,21 @@ const player2 = {
   damageAttack1: 5,
   damageAttack2: 10,
 };
+
+let obstacle1 = {
+  width: 120,
+  height: 160
+}
+
+let obstacle2 = {
+  width: 120,
+  height: 160
+}
+
+let obstacle = {
+  width: 120,
+  height: 160
+}
 
 // Spieler zeichnen (mit Animation)
 function drawPlayer(player, sprite, currentFrame) {
@@ -84,21 +99,13 @@ function drawPlayer(player, sprite, currentFrame) {
       player.x, // Destination X
       player.y, // Destination Y
       player.width, // Drawn width
-      player.height // Drawn height
+      player.height, // Drawn height
     );
   }
   
   function updateAnimationFrames() {
-    // spriteConfig.frameTimer += deltaTime;
 
-    // if (spriteConfig.frameTimer >= spriteConfig.animationSpeed) {
-    //   // Increment frames for both players
-    //   spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % spriteConfig.totalFrames;
-    //   spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % spriteConfig.totalFrames;
-  
-    //   // Reset timer
-    //   spriteConfig.frameTimer = 0;
-    // }
+
     if (player1.action === "jump") {
       spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // Nur 4 Frames für Sprung
     } else if (player1.action === "attack1") {
@@ -167,8 +174,8 @@ function update() {
   if (player1.isJumping) {
     player1.y += player1.velocityY;
     player1.velocityY += player1.gravity;
-    if (player1.y >= 300) {
-      player1.y = 300;
+    if (player1.y >= 150) {
+      player1.y = 150;
       player1.velocityY = 0;
       player1.isJumping = false;
     }
@@ -185,8 +192,8 @@ function update() {
   if (player2.isJumping) {
     player2.y += player2.velocityY;
     player2.velocityY += player2.gravity;
-    if (player2.y >= 300) {
-      player2.y = 300;
+    if (player2.y >= 150) {
+      player2.y = 150;
       player2.velocityY = 0;
       player2.isJumping = false;
     }
@@ -198,12 +205,13 @@ function update() {
 }
 
 // Überprüfe Modellkollision
-function checkModelOverlap(player1, player2) {
+function checkModelOverlap(obstacle1, obstacle2) {
+
   return (
-    player1.x < player2.x + player2.width &&
-    player1.x + player1.width > player2.x &&
-    player1.y < player2.y + player2.height &&
-    player1.y + player1.height > player2.y
+    obstacle1.x < obstacle2.x + obstacle2.width &&
+    obstacle1.x + obstacle1.width > obstacle2.x &&
+    obstacle1.y < obstacle2.y + obstacle2.height &&
+    obstacle1.y + obstacle1.height > obstacle2.y
   );
 }
 
@@ -325,6 +333,15 @@ function resetAction(player, delay) {
   }, delay);
 }
 
+// hitbox simulieren
+function drawObstacle() {
+  ctx.beginPath();
+  ctx.fillStyle = "red"
+  ctx.fillRect(player1.x +20 ,player1.y + 30,obstacle1.width, obstacle1.height);
+  ctx.fillRect(player2.x + 20 ,player2.y + 30,obstacle2.width, obstacle2.height);
+  ctx.closePath();
+}
+
 // Spiel-Loop
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -332,6 +349,7 @@ function gameLoop() {
   handleAnimations();
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
   drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
+  drawObstacle();
   updateAnimationFrames();
   drawHitbox(player1);
   drawHitbox(player2);
@@ -342,9 +360,10 @@ function gameLoop() {
   update();
   requestAnimationFrame(gameLoop);
 }
+
 gameLoop();
 
-
+// Timer
 {
     let timer = 120;
     const timerDisplay = document.getElementById('timer');
@@ -370,4 +389,10 @@ gameLoop();
     } else {
         console.warn('Timer-Element nicht gefunden!');
     }
+}
+
+document.getElementById('pause').addEventListener('click', pauseGame);
+
+function pauseGame(){
+  console.log("im working");
 }
