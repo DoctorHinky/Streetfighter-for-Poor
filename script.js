@@ -6,9 +6,25 @@ canvas.height = 400;
 
 // Hintergrund zeichnen
 function drawBackground() {
-  ctx.fillStyle = "#87CEEB"; // Himmelblau
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const img = new Image();
+  img.src = 'assets/background/Rusted_4.png';
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 }
+
+const player1Sprite = new Image();
+player1Sprite.src = "assets/sprites/Bancho/Sprite Sheets/Bancho_Idle-png"; // Pfad zum Bild für Spieler 1
+
+const player2Sprite = new Image();
+player2Sprite.src = "sprites/player2.png"; // Pfad zum Bild für Spieler 2
+
+// Animationseinstellungen
+const spriteConfig = {
+  frameWidth: 64, // Breite eines Frames im Spritesheet
+  frameHeight: 64, // Höhe eines Frames im Spritesheet
+  animationSpeed: 10, // Anzahl Frames pro Sekunde
+  player1Frame: 0, // aktueller Frame für Spieler 1
+  player2Frame: 0, // aktueller Frame für Spieler 2
+};
 
 // Charakter-Objekte
 const player1 = {
