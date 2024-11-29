@@ -35,58 +35,42 @@ const spriteConfig = {
   };
 
 // Charakter-Objekte
-const player1 = {
-  x: 100,
-  y: 150,
-  width: 200,
-  height: 200,
-  color: "blue",
-  speed: 5,
-  velocityY: 0,
-  isJumping: false,
-  jumpStrength: -15,
-  gravity: 0.8,
-  action: null,
-  health: 300,
-  hitbox: { x: 0, y: 0, width: 0, height: 0, active: false },
-  canAttack: true,
-  damageAttack1: 5,
-  damageAttack2: 10,
-};
 
-const player2 = {
-  x: 600,
-  y: 150,
-  width: 200,
-  height: 200,
-  color: "green",
-  speed: 5,
-  velocityY: 0,
-  isJumping: false,
-  jumpStrength: -17,
-  gravity: 0.8,
-  action: null,
-  health: 300,
-  hitbox: { x: 0, y: 0, width: 0, height: 0, active: false },
-  canAttack: true,
-  damageAttack1: 5,
-  damageAttack2: 10,
-};
 
-let obstacle1 = {
-  width: 120,
-  height: 160
+class player {
+  constructor(x, color) {
+    this.x = x,
+    this.y = 150,
+    this.color = color,
+
+    this.width = 200,
+    this.height = 200,
+    this.speed = 5,
+    this.velocityY = 0;
+    this. isJumping = false,
+    this.jumpStrength = -17,
+    this.gravity = 0.8,
+    this.action = null,
+    this.health = 300,
+    this.hitbox = { x: 0, y: 0, width: 0, height: 0, active: false },
+    this.canAttack = true,
+    this.damageAttack1 = 5,
+    this.damageAttack2 = 10
+  }
 }
 
-let obstacle2 = {
-  width: 120,
-  height: 160
-}
+const player1 = new player(100, 'blue');
+const player2 = new player(500, 'green');
 
-let obstacle = {
-  width: 120,
-  height: 160
-}
+class obstacle {
+  constructor(){
+    this.width = 120, 
+    this.height = 160;
+  }   
+} 
+
+const obstacle2 = new obstacle();
+const obstacle1 = new obstacle();
 
 // Spieler zeichnen (mit Animation)
 function drawPlayer(player, sprite, currentFrame) {
