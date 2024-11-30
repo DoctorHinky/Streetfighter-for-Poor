@@ -16,6 +16,8 @@ function drawBackground() {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
 }
 
+
+
 // initialisiere sprite sheet
 const player1SpriteSheet = new Image();
 player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png"; 
@@ -184,8 +186,8 @@ function update() {
   }
 
   // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(0, Math.min(canvas.width - player1.width, player1.x));
-  player2.x = Math.max(0, Math.min(canvas.width - player2.width, player2.x));
+  player1.x = Math.max(0, Math.min(canvas.width - obstacle1.width, player1.x));
+  player2.x = Math.max(0, Math.min(canvas.width - obstacle2.width, player2.x));
 }
 
 // Überprüfe Modellkollision
@@ -320,8 +322,8 @@ function resetAction(player, delay) {
 // hitbox simulieren
 function drawObstacle() {
   ctx.beginPath();
-  ctx.fillStyle = "red"
-  ctx.fillRect(player1.x +20 ,player1.y + 30,obstacle1.width, obstacle1.height);
+  ctx.fillStyle = "rgba(255, 0, 0, 0.6)"
+  ctx.fillRect(player1.x + 20 ,player1.y + 30,obstacle1.width, obstacle1.height);
   ctx.fillRect(player2.x + 20 ,player2.y + 30,obstacle2.width, obstacle2.height);
   ctx.closePath();
 }
