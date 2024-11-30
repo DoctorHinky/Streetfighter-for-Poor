@@ -45,9 +45,7 @@ body {
     border-radius: 50px;
     overflow: hidden;
     z-index: 10;
-    min-width: 650px;
-
-    
+    min-width: 650px; 
 }
 
 .player{
@@ -57,8 +55,7 @@ body {
 
 #player1-health{
     background: rgb(105,88,90);
-    background: linear-gradient(90deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);
-    
+    background: linear-gradient(90deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);    
 }
 #player2-health{
     background: rgb(105,88,90);

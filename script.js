@@ -138,13 +138,13 @@ function update() {
   // Bewegung von Spieler 2
   if (keys["ArrowLeft"]) {
     player2.x -= player2.speed;
-    if (checkModelOverlap(player2, player1)) {
+    if (checkModelOverlap(player1, player2)) {
       player2.x += player2.speed; // Bewegung rückgängig machen
     }
   }
   if (keys["ArrowRight"]) {
     player2.x += player2.speed;
-    if (checkModelOverlap(player2, player1)) {
+    if (checkModelOverlap(player1, player2)) {
       player2.x -= player2.speed; // Bewegung rückgängig machen
     }
   }
@@ -186,8 +186,8 @@ function update() {
   }
 
   // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(0, Math.min(canvas.width - obstacle1.width, player1.x));
-  player2.x = Math.max(0, Math.min(canvas.width - obstacle2.width, player2.x));
+  player1.x = Math.max(-18, Math.min(canvas.width - obstacle1.width, player1.x));
+  player2.x = Math.max(-18, Math.min(canvas.width - obstacle2.width, player2.x));
 }
 
 // Überprüfe Modellkollision
