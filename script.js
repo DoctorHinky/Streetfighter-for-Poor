@@ -188,17 +188,17 @@ function update() {
   player1.x = Math.max(-18, Math.min(canvas.width - obstacle1.width, player1.x));
   player2.x = Math.max(-18, Math.min(canvas.width - obstacle2.width, player2.x));
 }
-
-// Überprüfe Modellkollision
+//Überprüfe Modellkollision
+const margin = 42; // Margin to shrink the hitbox
 function checkModelOverlap(obstacle1, obstacle2) {
-
   return (
-    obstacle1.x < obstacle2.x + obstacle2.width &&
-    obstacle1.x + obstacle1.width > obstacle2.x &&
-    obstacle1.y < obstacle2.y + obstacle2.height &&
-    obstacle1.y + obstacle1.height > obstacle2.y
+    obstacle1.x + margin < obstacle2.x + obstacle2.width - margin &&
+    obstacle1.x + obstacle1.width - margin > obstacle2.x + margin &&
+    obstacle1.y + margin < obstacle2.y + obstacle2.height - margin &&
+    obstacle1.y + obstacle1.height - margin > obstacle2.y + margin
   );
 }
+
 
 // Aktionen verwalten
 function handleAnimations() {
