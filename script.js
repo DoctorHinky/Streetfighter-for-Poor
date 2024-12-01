@@ -25,14 +25,8 @@ const spriteConfig = {
     player2Frame: 0, // Current frame for Player 2
     totalFrames: 8, // Total frames in the sprite sheet
     frameTimer: 0, // Timer to track animation updates
+
   };
-
-const player1Sprite = new Image();
-player1Sprite.src = "assets/sprites/Bancho/Sprite Sheets/Bancho_Idle-png"; // Pfad zum Bild für Spieler 1
-
-const player2Sprite = new Image();
-player2Sprite.src = "sprites/player2.png"; // Pfad zum Bild für Spieler 2
-
 
 // Charakter-Objekte
 const player1 = {
@@ -206,6 +200,16 @@ function checkModelOverlap(player1, player2) {
     player1.y + player1.height > player2.y
   );
 }
+function drawModelOverlap(player1, player2) {
+  ctx.strokeStyle = "purple"; // Set the border color to purple for overlap boundaries
+  ctx.lineWidth = 2; // Set the border width
+
+  // Draw boundary box for player1
+  ctx.strokeRect(player1.x, player1.y, player1.width, player1.height);
+
+  // Draw boundary box for player2
+  ctx.strokeRect(player2.x, player2.y, player2.width, player2.height);
+}
 
 // Aktionen verwalten
 function handleAnimations() {
@@ -307,6 +311,7 @@ function drawHitbox(player) {
   }
 }
 
+
 // Gesundheitsbalken aktualisieren
 function updateHealth() {
   const player1HealthBar = document.getElementById("player1-health");
@@ -332,6 +337,7 @@ function gameLoop() {
   handleAnimations();
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
   drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
+  drawModelOverlap(player1, player2);
   updateAnimationFrames();
   drawHitbox(player1);
   drawHitbox(player2);
