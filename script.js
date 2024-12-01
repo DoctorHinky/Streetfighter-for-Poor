@@ -202,52 +202,34 @@ function checkModelOverlap(obstacle1, obstacle2) {
 
 // Aktionen verwalten
 function handleAnimations() {
-  // Aktionen für Spieler 1
-  if (keys["j"] && player1.canAttack) {
-    player1.action = "attack1";
-    player1.canAttack = false;
-    resetAction(player1, 200);
-    setTimeout(() => {
-      player1.canAttack = true;
-    }, 500);
+  function handlePlayerAction(player, key, action, canAttackDelay, resetDelay) {
+    if (keys[key] && player.canAttack) {
+      player.action = action;
+      player.canAttack = false;
+      resetAction(player, resetDelay);
+      setTimeout(() => {
+        player.canAttack = true;
+      }, canAttackDelay);
+    }
   }
 
-  if (keys["k"] && player1.canAttack) {
-    player1.action = "attack2";
-    player1.canAttack = false;
-    resetAction(player1, 200);
-    setTimeout(() => {
-      player1.canAttack = true;
-    }, 500);
-  }
-  if (keys['s']) {
-    player1.action = 'block';
+  // Aktionen für Spieler 1
+  handlePlayerAction(player1, "j", "attack1", 500, 200);
+  handlePlayerAction(player1, "k", "attack2", 500, 200);
+  if (keys["s"]) {
+    player1.action = "block";
     resetAction(player1, 300);
-}
+  }
 
   // Aktionen für Spieler 2
-  if (keys["1"] && player2.canAttack) {
-    player2.action = "attack1";
-    player2.canAttack = false;
-    resetAction(player2, 200);
-    setTimeout(() => {
-      player2.canAttack = true;
-    }, 500);
-  }
-
-  if (keys["2"] && player2.canAttack) {
-    player2.action = "attack2";
-    player2.canAttack = false;
-    resetAction(player2, 200);
-    setTimeout(() => {
-      player2.canAttack = true;
-    }, 500);
-  }
-  if (keys['ArrowDown']) {
-    player2.action = 'block';
+  handlePlayerAction(player2, "1", "attack1", 500, 200);
+  handlePlayerAction(player2, "2", "attack2", 500, 200);
+  if (keys["ArrowDown"]) {
+    player2.action = "block";
     resetAction(player2, 300);
+  }
 }
-}
+
 
 // Kollision mit Hitbox
 function handleCollisions() {
@@ -349,6 +331,8 @@ function gameLoop() {
 
 gameLoop();
 
+
+let isPaused = false;
 // Timer
 {
     let timer = 120;
@@ -358,10 +342,10 @@ gameLoop();
 
     if (timerDisplay) { // Vermeide Fehler, wenn das Element fehlt
         const timerInterval = setInterval(() => {
-            if (timer > 0) {
+            if (timer > 0 && isPaused === false) {
                 timer--;
                 timerDisplay.textContent = timer;
-            } else {
+            } else if(timer > 0 && isPaused === true) {} else {
                 clearInterval(timerInterval);  
                 if(player1.health > player2.health){
                     div.textContent = "PLAYER 1 WON!"
@@ -380,5 +364,9 @@ gameLoop();
 document.getElementById('pause').addEventListener('click', pauseGame);
 
 function pauseGame(){
-  console.log("im working");
+  if(isPaused === false){
+    return isPaused = true;
+  }else{
+    return isPaused = false;
+  }
 }
