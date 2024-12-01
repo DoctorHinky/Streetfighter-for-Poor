@@ -326,10 +326,8 @@ function drawObstacle() {
 function gameLoop(currentTime) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
-
   // Pass currentTime to updateAnimationFrames for smoother sprite updates
   updateAnimationFrames(currentTime);
-
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
   drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
   drawObstacle();
@@ -376,12 +374,15 @@ let isPaused = false;
     }
 }
 
-document.getElementById('pause').addEventListener('click', pauseGame);
+const pause = document.getElementById('pause')
+pause.addEventListener('click', pauseGame);
 
 function pauseGame(){
   if(isPaused === false){
+    pause.textContent = 'play';
     return isPaused = true;
   }else{
+    pause.textContent = "pause"
     return isPaused = false;
   }
 }
