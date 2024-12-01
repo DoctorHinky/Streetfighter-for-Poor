@@ -84,3 +84,13 @@ body {
     width: 100%;
     height: 100%;
 }
+
+#pause{
+    position: absolute;
+    color: white;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    animation: colorturn 1s steps(3) infinite;
+    cursor: pointer;
+}
