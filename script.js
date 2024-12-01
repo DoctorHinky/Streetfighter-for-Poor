@@ -90,8 +90,6 @@ function drawPlayer(player, sprite, currentFrame) {
   }
   
   function updateAnimationFrames() {
-
-
     if (player1.action === "jump") {
       spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // Nur 4 Frames für Sprung
     } else if (player1.action === "attack1") {
