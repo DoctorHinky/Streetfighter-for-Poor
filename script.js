@@ -90,23 +90,35 @@ function drawPlayer(player, sprite, currentFrame) {
     );
   }
   
-  function updateAnimationFrames() {
-    if (player1.action === "jump") {
-      spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // Nur 4 Frames für Sprung
-    } else if (player1.action === "attack1") {
-      spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 6; // 6 Frames für Angriff
-    } else {
-      spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 3; // Standardlauf (3 Frames)
-    }
+  let lastSpriteUpdateTime = 0; // Tracks the last time the sprite frame was updated
+
+  function updateAnimationFrames(currentTime) {
+    const spriteAnimationSpeed = 100; // Milliseconds per frame (adjust for slower/faster animation)
   
-    if (player2.action === "jump") {
-      spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 4;
-    } else if (player2.action === "attack1") {
-      spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 6;
-    } else {
-      spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 3;
+    // Only update the frame if enough time has passed
+    if (currentTime - lastSpriteUpdateTime >= spriteAnimationSpeed) {
+      lastSpriteUpdateTime = currentTime;
+  
+      // Update player1's animation frame
+      if (player1.action === "jump") {
+        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // 4 frames for jump
+      } else if (player1.action === "attack1") {
+        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 6; // 6 frames for attack
+      } else {
+        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 7; // Default idle (3 frames)
+      }
+  
+      // Update player2's animation frame
+      if (player2.action === "jump") {
+        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 4;
+      } else if (player2.action === "attack1") {
+        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 6;
+      } else {
+        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 7;
+      }
     }
   }
+  
 // Tastenverwaltung
 const keys = {};
 
@@ -311,14 +323,16 @@ function drawObstacle() {
 }
 
 // Spiel-Loop
-function gameLoop() {
+function gameLoop(currentTime) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
-  handleAnimations();
+
+  // Pass currentTime to updateAnimationFrames for smoother sprite updates
+  updateAnimationFrames(currentTime);
+
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
   drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
   drawObstacle();
-  updateAnimationFrames();
   drawHitbox(player1);
   drawHitbox(player2);
   updateHitbox(player1);
@@ -326,10 +340,11 @@ function gameLoop() {
   handleCollisions();
   updateHealth();
   update();
+  
   requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+requestAnimationFrame(gameLoop);
 
 
 let isPaused = false;
