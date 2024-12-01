@@ -16,6 +16,8 @@ function drawBackground() {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
 }
 
+
+
 // initialisiere sprite sheet
 const player1SpriteSheet = new Image();
 player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png"; 
@@ -36,58 +38,42 @@ const spriteConfig = {
   };
 
 // Charakter-Objekte
-const player1 = {
-  x: 100,
-  y: 150,
-  width: 200,
-  height: 200,
-  color: "blue",
-  speed: 5,
-  velocityY: 0,
-  isJumping: false,
-  jumpStrength: -15,
-  gravity: 0.8,
-  action: null,
-  health: 300,
-  hitbox: { x: 0, y: 0, width: 0, height: 0, active: false },
-  canAttack: true,
-  damageAttack1: 5,
-  damageAttack2: 10,
-};
 
-const player2 = {
-  x: 600,
-  y: 150,
-  width: 200,
-  height: 200,
-  color: "green",
-  speed: 5,
-  velocityY: 0,
-  isJumping: false,
-  jumpStrength: -17,
-  gravity: 0.8,
-  action: null,
-  health: 300,
-  hitbox: { x: 0, y: 0, width: 0, height: 0, active: false },
-  canAttack: true,
-  damageAttack1: 5,
-  damageAttack2: 10,
-};
 
-let obstacle1 = {
-  width: 120,
-  height: 160
+class player {
+  constructor(x, color) {
+    this.x = x,
+    this.y = 150,
+    this.color = color,
+
+    this.width = 200,
+    this.height = 200,
+    this.speed = 5,
+    this.velocityY = 0;
+    this. isJumping = false,
+    this.jumpStrength = -17,
+    this.gravity = 0.8,
+    this.action = null,
+    this.health = 300,
+    this.hitbox = { x: 0, y: 0, width: 0, height: 0, active: false },
+    this.canAttack = true,
+    this.damageAttack1 = 5,
+    this.damageAttack2 = 10
+  }
 }
 
-let obstacle2 = {
-  width: 120,
-  height: 160
-}
+const player1 = new player(100, 'blue');
+const player2 = new player(500, 'green');
 
-let obstacle = {
-  width: 120,
-  height: 160
-}
+class obstacle {
+  constructor(){
+    this.width = 120, 
+    this.height = 160;
+  }   
+} 
+
+const obstacle2 = new obstacle();
+const obstacle1 = new obstacle();
 
 // Spieler zeichnen (mit Animation)
 function drawPlayer(player, sprite, currentFrame) {
@@ -105,8 +91,6 @@ function drawPlayer(player, sprite, currentFrame) {
   }
   
   function updateAnimationFrames() {
-
-
     if (player1.action === "jump") {
       spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // Nur 4 Frames für Sprung
     } else if (player1.action === "attack1") {
@@ -153,13 +137,13 @@ function update() {
   // Bewegung von Spieler 2
   if (keys["ArrowLeft"]) {
     player2.x -= player2.speed;
-    if (checkModelOverlap(player2, player1)) {
+    if (checkModelOverlap(player1, player2)) {
       player2.x += player2.speed; // Bewegung rückgängig machen
     }
   }
   if (keys["ArrowRight"]) {
     player2.x += player2.speed;
-    if (checkModelOverlap(player2, player1)) {
+    if (checkModelOverlap(player1, player2)) {
       player2.x -= player2.speed; // Bewegung rückgängig machen
     }
   }
@@ -201,8 +185,8 @@ function update() {
   }
 
   // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(0, Math.min(canvas.width - player1.width, player1.x));
-  player2.x = Math.max(0, Math.min(canvas.width - player2.width, player2.x));
+  player1.x = Math.max(-18, Math.min(canvas.width - obstacle1.width, player1.x));
+  player2.x = Math.max(-18, Math.min(canvas.width - obstacle2.width, player2.x));
 }
 
 // Überprüfe Modellkollision
@@ -338,8 +322,8 @@ function resetAction(player, delay) {
 // hitbox simulieren
 function drawObstacle() {
   ctx.beginPath();
-  ctx.fillStyle = "red"
-  ctx.fillRect(player1.x +20 ,player1.y + 30,obstacle1.width, obstacle1.height);
+  ctx.fillStyle = "rgba(255, 0, 0, 0.6)"
+  ctx.fillRect(player1.x + 20 ,player1.y + 30,obstacle1.width, obstacle1.height);
   ctx.fillRect(player2.x + 20 ,player2.y + 30,obstacle2.width, obstacle2.height);
   ctx.closePath();
 }
