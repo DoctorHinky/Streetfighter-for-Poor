@@ -25,17 +25,25 @@ player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png";
 const player2SpriteSheet = new Image();
 player2SpriteSheet.src ="./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Idle.png";
 
+const player1Attack1SpriteSheet = new Image();
+player1Attack1SpriteSheet.src = "./assets/sprites/Bancho/Sprite_Sheet/Bancho_attack3.png";
+
+const player2Attack1SpriteSheet = new Image();
+player2Attack1SpriteSheet.src = "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_attack02.png";
 // Animationseinstellungen
 const spriteConfig = {
-    frameWidth: 100, // Width of each frame in the sprite sheet
-    frameHeight: 100, // Height of each frame in the sprite sheet
-    animationSpeed: 100, // Time (ms) per frame
-    player1Frame: 0, // Current frame for Player 1
-    player2Frame: 0, // Current frame for Player 2
-    totalFrames: 8, // Total frames in the sprite sheet
-    frameTimer: 0, // Timer to track animation updates
+  frameWidth: 100, // Width of each frame in the sprite sheet
+  frameHeight: 100, // Height of each frame in the sprite sheet
+  animationSpeed: 100, // Time (ms) per frame
+  player1Frame: 0, // Current frame for Player 1
+  player2Frame: 0, // Current frame for Player 2
+  idleFrames: 7, // Frames for idle animation
+  attack1Frames: 6, // Frames for attack1 animation
+  jumpFrames: 4, // Frames for jump animation
+  frameTimer: 0, // Timer to track animation updates
+};
 
-  };
+
 
 // Charakter-Objekte
 
@@ -68,45 +76,55 @@ const player2 = new player(500, 'green');
 
 
 // Spieler zeichnen (mit Animation)
-function drawPlayer(player, sprite, currentFrame) {
-    ctx.drawImage(
-      sprite, // The sprite sheet
-      currentFrame * spriteConfig.frameWidth, // Source X (current frame)
-      0, // Source Y (first row only)
-      spriteConfig.frameWidth, // Frame width
-      spriteConfig.frameHeight, // Frame height
-      player.x, // Destination X
-      player.y, // Destination Y
-      player.width, // Drawn width
-      player.height, // Drawn height
-    );
+function drawPlayer(player, currentFrame) {
+  let sprite; // Decide which sprite sheet to use
+
+  if (player.action === "attack1") {
+    // Use the attack sprite sheet
+    sprite = player === player1 ? player1Attack1SpriteSheet : player2Attack1SpriteSheet;
+  } else {
+    // Use the idle sprite sheet
+    sprite = player === player1 ? player1SpriteSheet : player2SpriteSheet;
   }
+
+  ctx.drawImage(
+    sprite,
+    currentFrame * spriteConfig.frameWidth, // Source X (current frame in the sprite sheet)
+    0, // Source Y (row for the animation, adjust if you have multiple rows)
+    spriteConfig.frameWidth, // Width of the frame
+    spriteConfig.frameHeight, // Height of the frame
+    player.x, // Destination X position on the canvas
+    player.y, // Destination Y position on the canvas
+    player.width, // Width of the player (scaled)
+    player.height // Height of the player (scaled)
+  );
+}
+
   
   let lastSpriteUpdateTime = 0; // Tracks the last time the sprite frame was updated
 
   function updateAnimationFrames(currentTime) {
-    const spriteAnimationSpeed = 100; // Milliseconds per frame (adjust for slower/faster animation)
+    const spriteAnimationSpeed = spriteConfig.animationSpeed;
   
-    // Only update the frame if enough time has passed
     if (currentTime - lastSpriteUpdateTime >= spriteAnimationSpeed) {
       lastSpriteUpdateTime = currentTime;
   
-      // Update player1's animation frame
-      if (player1.action === "jump") {
-        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 4; // 4 frames for jump
-      } else if (player1.action === "attack1") {
-        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 6; // 6 frames for attack
+      // Player 1 Animation
+      if (player1.action === "attack1") {
+        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % spriteConfig.attack1Frames;
+      } else if (player1.action === "jump") {
+        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % spriteConfig.jumpFrames;
       } else {
-        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % 7; // Default idle (3 frames)
+        spriteConfig.player1Frame = (spriteConfig.player1Frame + 1) % spriteConfig.idleFrames;
       }
   
-      // Update player2's animation frame
-      if (player2.action === "jump") {
-        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 4;
-      } else if (player2.action === "attack1") {
-        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 6;
+      // Player 2 Animation
+      if (player2.action === "attack1") {
+        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % spriteConfig.attack1Frames;
+      } else if (player2.action === "jump") {
+        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % spriteConfig.jumpFrames;
       } else {
-        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % 7;
+        spriteConfig.player2Frame = (spriteConfig.player2Frame + 1) % spriteConfig.idleFrames;
       }
     }
   }
@@ -207,33 +225,27 @@ function checkModelOverlap(player1, player2) {
 
 // Aktionen verwalten
 function handleAnimations() {
-  function handlePlayerAction(player, key, action, canAttackDelay, resetDelay) {
+  function handlePlayerAction(player, key, action, frames, canAttackDelay, resetDelay) {
     if (keys[key] && player.canAttack) {
       player.action = action;
+      spriteConfig[player === player1 ? "player1Frame" : "player2Frame"] = 0; // Reset frame to the start
       player.canAttack = false;
-      resetAction(player, resetDelay);
       setTimeout(() => {
-        player.canAttack = true;
+        player.action = null; // Reset action after animation finishes
+      }, frames * spriteConfig.animationSpeed); // Total time for the animation
+      setTimeout(() => {
+        player.canAttack = true; // Allow attack after cooldown
       }, canAttackDelay);
     }
   }
 
-  // Aktionen für Spieler 1
-  handlePlayerAction(player1, "j", "attack1", 500, 200);
-  handlePlayerAction(player1, "k", "attack2", 500, 200);
-  if (keys["s"]) {
-    player1.action = "block";
-    resetAction(player1, 300);
-  }
+  // Player 1 actions (attack1 on 'j')
+  handlePlayerAction(player1, "j", "attack1", spriteConfig.attack1Frames, 500, 200);
 
-  // Aktionen für Spieler 2
-  handlePlayerAction(player2, "1", "attack1", 500, 200);
-  handlePlayerAction(player2, "2", "attack2", 500, 200);
-  if (keys["ArrowDown"]) {
-    player2.action = "block";
-    resetAction(player2, 300);
-  }
+  // Player 2 actions (attack1 on '1')
+  handlePlayerAction(player2, "1", "attack1", spriteConfig.attack1Frames, 500, 200);
 }
+
 
 
 // Kollision mit Hitbox
@@ -309,25 +321,25 @@ function resetAction(player, delay) {
 
 // Spiel-Loop
 function gameLoop(currentTime) {
-  if(!isPaused){
+  if (!isPaused) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBackground();
-  updateAnimationFrames(currentTime);
-  drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
-  drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
-  drawHitbox(player1);
-  drawHitbox(player2);
-  updateHitbox(player1);
-  updateHitbox(player2);
-  handleCollisions();
-  updateHealth();
-  update();
+    drawBackground();
+    updateAnimationFrames(currentTime); // Update animation frames
+    handleAnimations(); // Handle player actions
+    drawPlayer(player1, spriteConfig.player1Frame); // Draw Player 1
+    drawPlayer(player2, spriteConfig.player2Frame); // Draw Player 2
+    drawHitbox(player1); // Debugging hitboxes
+    drawHitbox(player2);
+    updateHitbox(player1); // Update hitboxes for collision
+    updateHitbox(player2);
+    handleCollisions(); // Handle collisions
+    updateHealth(); // Update health bars
+    update(); // Handle player movement
   }
-  
   requestAnimationFrame(gameLoop);
 }
-
 requestAnimationFrame(gameLoop);
+
 
 
 let isPaused = false;
