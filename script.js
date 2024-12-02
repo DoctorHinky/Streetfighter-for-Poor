@@ -309,7 +309,8 @@ function resetAction(player, delay) {
 
 // Spiel-Loop
 function gameLoop(currentTime) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if(!isPaused){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
   updateAnimationFrames(currentTime);
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
@@ -321,6 +322,7 @@ function gameLoop(currentTime) {
   handleCollisions();
   updateHealth();
   update();
+  }
   
   requestAnimationFrame(gameLoop);
 }
