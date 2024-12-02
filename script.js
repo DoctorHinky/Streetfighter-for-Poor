@@ -65,7 +65,15 @@ class player {
 const player1 = new player(100, 'blue');
 const player2 = new player(500, 'green');
 
+class obstacle {
+  constructor(){
+    this.width = 120, 
+    this.height = 160;
+  }   
+} 
 
+const obstacle2 = new obstacle();
+const obstacle1 = new obstacle();
 
 // Spieler zeichnen (mit Animation)
 function drawPlayer(player, sprite, currentFrame) {
@@ -189,52 +197,69 @@ function update() {
   }
 
   // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(-18, Math.min(canvas.width - player1.width, player1.x));
-  player2.x = Math.max(-18, Math.min(canvas.width - player2.width, player2.x));
+  player1.x = Math.max(-18, Math.min(canvas.width - obstacle1.width, player1.x));
+  player2.x = Math.max(-18, Math.min(canvas.width - obstacle2.width, player2.x));
 }
 //Überprüfe Modellkollision
 const margin = 42; // Margin to shrink the hitbox
-function checkModelOverlap(player1, player2) {
+function checkModelOverlap(obstacle1, obstacle2) {
   return (
-    player1.x + margin < player2.x + player2.width - margin &&
-    player1.x + player1.width - margin > player2.x + margin &&
-    player1.y + margin < player2.y + player2.height - margin &&
-    player1.y + player1.height - margin > player2.y + margin
+    obstacle1.x + margin < obstacle2.x + obstacle2.width - margin &&
+    obstacle1.x + obstacle1.width - margin > obstacle2.x + margin &&
+    obstacle1.y + margin < obstacle2.y + obstacle2.height - margin &&
+    obstacle1.y + obstacle1.height - margin > obstacle2.y + margin
   );
 }
 
 
-
 // Aktionen verwalten
 function handleAnimations() {
-  function handlePlayerAction(player, key, action, canAttackDelay, resetDelay) {
-    if (keys[key] && player.canAttack) {
-      player.action = action;
-      player.canAttack = false;
-      resetAction(player, resetDelay);
-      setTimeout(() => {
-        player.canAttack = true;
-      }, canAttackDelay);
-    }
-  }
-
   // Aktionen für Spieler 1
-  handlePlayerAction(player1, "j", "attack1", 500, 200);
-  handlePlayerAction(player1, "k", "attack2", 500, 200);
-  if (keys["s"]) {
-    player1.action = "block";
-    resetAction(player1, 300);
+  if (keys["j"] && player1.canAttack) {
+    player1.action = "attack1";
+    player1.canAttack = false;
+    resetAction(player1, 200);
+    setTimeout(() => {
+      player1.canAttack = true;
+    }, 500);
   }
 
-  // Aktionen für Spieler 2
-  handlePlayerAction(player2, "1", "attack1", 500, 200);
-  handlePlayerAction(player2, "2", "attack2", 500, 200);
-  if (keys["ArrowDown"]) {
-    player2.action = "block";
-    resetAction(player2, 300);
+  if (keys["k"] && player1.canAttack) {
+    player1.action = "attack2";
+    player1.canAttack = false;
+    resetAction(player1, 200);
+    setTimeout(() => {
+      player1.canAttack = true;
+    }, 500);
   }
+  if (keys['s']) {
+    player1.action = 'block';
+    resetAction(player1, 300);
 }
 
+  // Aktionen für Spieler 2
+  if (keys["1"] && player2.canAttack) {
+    player2.action = "attack1";
+    player2.canAttack = false;
+    resetAction(player2, 200);
+    setTimeout(() => {
+      player2.canAttack = true;
+    }, 500);
+  }
+
+  if (keys["2"] && player2.canAttack) {
+    player2.action = "attack2";
+    player2.canAttack = false;
+    resetAction(player2, 200);
+    setTimeout(() => {
+      player2.canAttack = true;
+    }, 500);
+  }
+  if (keys['ArrowDown']) {
+    player2.action = 'block';
+    resetAction(player2, 300);
+}
+}
 
 // Kollision mit Hitbox
 function handleCollisions() {
@@ -306,14 +331,26 @@ function resetAction(player, delay) {
   }, delay);
 }
 
+// hitbox simulieren
+function drawObstacle() {
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(255, 0, 0, 0.6)"
+  ctx.fillRect(player1.x + 20 ,player1.y + 30,obstacle1.width, obstacle1.height);
+  ctx.fillRect(player2.x + 20 ,player2.y + 30,obstacle2.width, obstacle2.height);
+  ctx.closePath();
+}
 
 // Spiel-Loop
 function gameLoop(currentTime) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
+
+  // Pass currentTime to updateAnimationFrames for smoother sprite updates
   updateAnimationFrames(currentTime);
+
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
   drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
+  drawObstacle();
   drawHitbox(player1);
   drawHitbox(player2);
   updateHitbox(player1);
@@ -327,8 +364,6 @@ function gameLoop(currentTime) {
 
 requestAnimationFrame(gameLoop);
 
-
-let isPaused = false;
 // Timer
 {
     let timer = 120;
@@ -338,10 +373,10 @@ let isPaused = false;
 
     if (timerDisplay) { // Vermeide Fehler, wenn das Element fehlt
         const timerInterval = setInterval(() => {
-            if (timer > 0 && isPaused === false) {
+            if (timer > 0) {
                 timer--;
                 timerDisplay.textContent = timer;
-            } else if(timer > 0 && isPaused === true) {} else {
+            } else {
                 clearInterval(timerInterval);  
                 if(player1.health > player2.health){
                     div.textContent = "PLAYER 1 WON!"
@@ -357,15 +392,8 @@ let isPaused = false;
     }
 }
 
-const pause = document.getElementById('pause')
-pause.addEventListener('click', pauseGame);
+document.getElementById('pause').addEventListener('click', pauseGame);
 
 function pauseGame(){
-  if(isPaused === false){
-    pause.textContent = 'play';
-    return isPaused = true;
-  }else{
-    pause.textContent = "pause"
-    return isPaused = false;
-  }
+  console.log("im working");
 }
