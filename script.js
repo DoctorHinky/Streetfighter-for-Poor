@@ -65,15 +65,7 @@ class player {
 const player1 = new player(100, 'blue');
 const player2 = new player(500, 'green');
 
-class obstacle {
-  constructor(){
-    this.width = 120, 
-    this.height = 160;
-  }   
-} 
 
-const obstacle2 = new obstacle();
-const obstacle1 = new obstacle();
 
 // Spieler zeichnen (mit Animation)
 function drawPlayer(player, sprite, currentFrame) {
@@ -197,19 +189,20 @@ function update() {
   }
 
   // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(-18, Math.min(canvas.width - obstacle1.width, player1.x));
-  player2.x = Math.max(-18, Math.min(canvas.width - obstacle2.width, player2.x));
+  player1.x = Math.max(-18, Math.min(canvas.width - player1.width, player1.x));
+  player2.x = Math.max(-18, Math.min(canvas.width - player2.width, player2.x));
 }
 //Überprüfe Modellkollision
 const margin = 42; // Margin to shrink the hitbox
-function checkModelOverlap(obstacle1, obstacle2) {
+function checkModelOverlap(player1, player2) {
   return (
-    obstacle1.x + margin < obstacle2.x + obstacle2.width - margin &&
-    obstacle1.x + obstacle1.width - margin > obstacle2.x + margin &&
-    obstacle1.y + margin < obstacle2.y + obstacle2.height - margin &&
-    obstacle1.y + obstacle1.height - margin > obstacle2.y + margin
+    player1.x + margin < player2.x + player2.width - margin &&
+    player1.x + player1.width - margin > player2.x + margin &&
+    player1.y + margin < player2.y + player2.height - margin &&
+    player1.y + player1.height - margin > player2.y + margin
   );
 }
+
 
 
 // Aktionen verwalten
@@ -313,24 +306,14 @@ function resetAction(player, delay) {
   }, delay);
 }
 
-// hitbox simulieren
-function drawObstacle() {
-  ctx.beginPath();
-  ctx.fillStyle = "rgba(255, 0, 0, 0.6)"
-  ctx.fillRect(player1.x + 20 ,player1.y + 30,obstacle1.width, obstacle1.height);
-  ctx.fillRect(player2.x + 20 ,player2.y + 30,obstacle2.width, obstacle2.height);
-  ctx.closePath();
-}
 
 // Spiel-Loop
 function gameLoop(currentTime) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
-  // Pass currentTime to updateAnimationFrames for smoother sprite updates
   updateAnimationFrames(currentTime);
   drawPlayer(player1, player1SpriteSheet, spriteConfig.player1Frame);
   drawPlayer(player2, player2SpriteSheet, spriteConfig.player2Frame);
-  drawObstacle();
   drawHitbox(player1);
   drawHitbox(player2);
   updateHitbox(player1);
