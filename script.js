@@ -23,13 +23,13 @@ const player1SpriteSheet = new Image();
 player1SpriteSheet.src ="./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png"; 
 
 const player2SpriteSheet = new Image();
-player2SpriteSheet.src ="./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Idle.png";
+player2SpriteSheet.src ="./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Idle-Sheet.png";
 
 const player1Attack1SpriteSheet = new Image();
 player1Attack1SpriteSheet.src = "./assets/sprites/Bancho/Sprite_Sheet/Bancho_attack3.png";
 
 const player2Attack1SpriteSheet = new Image();
-player2Attack1SpriteSheet.src = "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_attack02.png";
+player2Attack1SpriteSheet.src = "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_attack02-Sheet.png";
 // Animationseinstellungen
 const spriteConfig = {
   frameWidth: 100, // Width of each frame in the sprite sheet
@@ -46,7 +46,6 @@ const spriteConfig = {
 
 
 // Charakter-Objekte
-
 
 class player {
   constructor(x, color) {
