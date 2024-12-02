@@ -1,8 +1,8 @@
 // Initialisiere Canvas
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 400;
+canvas.width = 1200;
+canvas.height = 600;
 
 const background = new Image();
 background.src = './assets/background/Rusted_4.webp'; 
@@ -43,16 +43,16 @@ const spriteConfig = {
 class player {
   constructor(x, color) {
     this.x = x,
-    this.y = 150,
+    this.y = 250,
     this.color = color,
 
-    this.width = 200,
-    this.height = 200,
-    this.speed = 5,
+    this.width = 250,
+    this.height = 250,
+    this.speed = 10,
     this.velocityY = 0;
     this. isJumping = false,
-    this.jumpStrength = -17,
-    this.gravity = 0.8,
+    this.jumpStrength = -25,
+    this.gravity = 1.2,
     this.action = null,
     this.health = 300,
     this.hitbox = { x: 0, y: 0, width: 0, height: 0, active: false },
@@ -156,6 +156,7 @@ function update() {
   if (keys["w"] && !player1.isJumping) {
     player1.velocityY = player1.jumpStrength;
     player1.isJumping = true;
+    player1.speed += 5;
     player1.action = "jump";
     resetAction(player1, 500);
   }
@@ -163,8 +164,9 @@ function update() {
   if (player1.isJumping) {
     player1.y += player1.velocityY;
     player1.velocityY += player1.gravity;
-    if (player1.y >= 150) {
-      player1.y = 150;
+    if (player1.y >= 250) {
+      player1.y = 250;
+      player1.speed -= 5;
       player1.velocityY = 0;
       player1.isJumping = false;
     }
@@ -174,6 +176,7 @@ function update() {
   if (keys["ArrowUp"] && !player2.isJumping) {
     player2.velocityY = player2.jumpStrength;
     player2.isJumping = true;
+    player2.speed += 5;
     player2.action = "jump";
     resetAction(player2, 500);
   }
@@ -181,8 +184,9 @@ function update() {
   if (player2.isJumping) {
     player2.y += player2.velocityY;
     player2.velocityY += player2.gravity;
-    if (player2.y >= 150) {
-      player2.y = 150;
+    if (player2.y >= 250) {
+      player.speed -= 5;
+      player2.y = 250;
       player2.velocityY = 0;
       player2.isJumping = false;
     }
