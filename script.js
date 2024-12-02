@@ -342,7 +342,8 @@ function drawObstacle() {
 
 // Spiel-Loop
 function gameLoop(currentTime) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if(!isPaused){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
 
   // Pass currentTime to updateAnimationFrames for smoother sprite updates
@@ -358,6 +359,7 @@ function gameLoop(currentTime) {
   handleCollisions();
   updateHealth();
   update();
+  }
   
   requestAnimationFrame(gameLoop);
 }
