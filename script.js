@@ -338,7 +338,7 @@ let isPaused = false;
     const div = timerDisplay.parentElement
     
 
-    if (timerDisplay) { // Vermeide Fehler, wenn das Element fehlt
+    if (timerDisplay) { // Vermeide Fehler, wenn das Element fehltt
         const timerInterval = setInterval(() => {
             if (timer > 0 && isPaused === false) {
                 timer--;
