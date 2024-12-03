@@ -380,10 +380,38 @@ pause.addEventListener('click', pauseGame);
 
 function pauseGame(){
   if(isPaused === false){
+    document.getElementById('game-canvas').style.display = 'none';
+    document.getElementById('game-container').innerHTML = `
+    <div id="pause-screen">
+      <h1>PAUSED</h1>
+      <button id="resume">resume</button>
+      <button id="restart">restart</button>
+      <button id="quit">quit</button>
+    </div>
+    `
     pause.textContent = 'play';
-    return isPaused = true;
+    isPaused = true;
+    
   }else{
     pause.textContent = "pause"
-    return isPaused = false;
+    document.getElementById('game-canvas').style.display = 'block';
+    document.getElementById('pause-screen').remove();
+    isPaused = false;
   }
 }
+
+
+document.getElementById('game-container').addEventListener('click', (e) => {
+  if(e.target.id === 'resume'){
+    pauseGame();
+  }else if(e.target.id === 'restart'){
+    pauseGame();
+    timer = 120;
+    player1.health = 300;
+    player2.health = 300;
+    player1.x = 100;
+    player2.x = 500;
+  }else if(e.target.id === 'quit'){
+    location.href = 'index.html';
+  }
+});
