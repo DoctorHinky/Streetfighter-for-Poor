@@ -48,18 +48,25 @@ body {
     min-width: 650px; 
 }
 
-.player{
+.health-container{
+    width: 400px;
     height: 100%;
-    z-index: 100;
+}
+
+.player-health{
+    height: 100%;
+    width: 50%;
 }
 
 #player1-health{
     background: rgb(105,88,90);
-    background: linear-gradient(90deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);    
+    background: linear-gradient(90deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%); 
+    z-index: 100;   
 }
 #player2-health{
     background: rgb(105,88,90);
     background: linear-gradient(270deg, rgba(105,88,90,1) 5%, rgba(138,22,22,1) 37%);
+    z-index: 100;
 }
 
 
