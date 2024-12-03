@@ -1,8 +1,8 @@
 // Initialisiere Canvas
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 1200;
-canvas.height = 600;
+canvas.width = 800;
+canvas.height = 400;
 
 const background = new Image();
 background.src = "./assets/background/Rusted_4.webp";
@@ -562,8 +562,12 @@ function drawHitbox(player) {
 function updateHealth() {
   const player1HealthBar = document.getElementById("player1-health");
   const player2HealthBar = document.getElementById("player2-health");
-  player1HealthBar.style.width = `${(player1.health / 300) * 100}%`;
-  player2HealthBar.style.width = `${(player2.health / 300) * 100}%`;
+  if(player1HealthBar){
+    player1HealthBar.style.width = `${(player1.health / 300) * 100}%`;
+  }
+  if(player2HealthBar){
+    player2HealthBar.style.width = `${(player2.health / 300) * 100}%`;
+  }
 }
 // Aktion zurücksetzen
 function resetAction(player, delay) {
@@ -659,40 +663,47 @@ requestAnimationFrame(gameLoop);
 const pause = document.getElementById('pause')
 pause.addEventListener('click', pauseGame);
 
-function pauseGame(){
-  if(isPaused === false){
-    document.getElementById('game-canvas').style.display = 'none';
-    document.getElementById('game-container').innerHTML = `
-    <div id="pause-screen">
+function pauseGame() {
+  if (!isPaused) {
+    // Create a pause overlay instead of replacing the entire container
+    const pauseOverlay = document.createElement('div');
+    pauseOverlay.id = 'pause-screen';
+    pauseOverlay.innerHTML = `
       <h1>PAUSED</h1>
       <button id="resume">resume</button>
       <button id="restart">restart</button>
-      <button id="quit">quit</button>
-    </div>
-    `
+    `;
+    pauseOverlay.style.position = 'absolute';
+    pauseOverlay.style.top = '0';
+    pauseOverlay.style.left = '0';
+    pauseOverlay.style.width = '100%';
+    pauseOverlay.style.height = '100%';
+    pauseOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    pauseOverlay.style.display = 'flex';
+    pauseOverlay.style.flexDirection = 'column';
+    pauseOverlay.style.justifyContent = 'center';
+    pauseOverlay.style.alignItems = 'center';
+    pauseOverlay.style.zIndex = '1000';
+
+    document.getElementById('game-container').appendChild(pauseOverlay);
     pause.textContent = 'play';
     isPaused = true;
-    
-  }else{
-    pause.textContent = "pause"
-    document.getElementById('game-canvas').style.display = 'block';
-    document.getElementById('pause-screen').remove();
+  } else {
+    // Remove only the pause screen, keeping the game container intact
+    const pauseScreen = document.getElementById('pause-screen');
+    if (pauseScreen) {
+      pauseScreen.remove();
+    }
+    pause.textContent = "pause";
     isPaused = false;
   }
 }
 
-
+// Modify the event listener to work with the new pause overlay
 document.getElementById('game-container').addEventListener('click', (e) => {
-  if(e.target.id === 'resume'){
-    pauseGame();
-  }else if(e.target.id === 'restart'){
-    pauseGame();
-    timer = 120;
-    player1.health = 300;
-    player2.health = 300;
-    player1.x = 100;
-    player2.x = 500;
-  }else if(e.target.id === 'quit'){
-    location.href = 'index.html';
+  if (e.target.id === 'resume') {
+    pauseGame(); // This will remove the pause screen
+  } else if (e.target.id === 'restart') {
+    location.href = 'index.html'; // da es statisch is wird das spiel neu gestarten / not the best way
   }
 });
