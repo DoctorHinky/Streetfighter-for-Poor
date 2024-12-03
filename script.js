@@ -30,7 +30,7 @@ const characterConfig = {
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_walk.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
-      speed: 50,
+      speed: 20,
     },
     hurt: {
       frames: 3,
@@ -69,7 +69,7 @@ const characterConfig = {
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Walk-Sheet.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
-      speed: 50,
+      speed: 20,
     },
     hurt: {
       frames: 4,
@@ -185,7 +185,7 @@ class Player {
     this.width = 200; // Feste Zielgröße
     this.height = 200; // Feste Zielgröße
     this.action = 'idle';
-    this.speed = 5;
+    this.speed = 3;
     this.velocityY = 0;
     this.isJumping = false;
     this.health = 100;
@@ -259,7 +259,7 @@ function updateAnimationFrames(currentTime) {
 
     // Player 1
     const player1Config = characterConfig[player1.character][player1.action || "idle"];
-    const player1Speed = player1Config.speed || 100;
+    const player1Speed = player1Config.speed;
   
     if (currentTime - player1.lastFrameUpdateTime >= player1Speed) {
       if (player1.action === 'attack1' || player1.action === 'attack2') {
@@ -273,7 +273,7 @@ function updateAnimationFrames(currentTime) {
   
     // Spieler 2
     const player2Config = characterConfig[player2.character][player2.action || "idle"];
-    const player2Speed = player2Config.speed || 100;
+    const player2Speed = player2Config.speed;
   
     if (currentTime - player2.lastFrameUpdateTime >= player2Speed) {
       if (player2.action === 'attack1' || player2.action === 'attack2') {
