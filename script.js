@@ -30,7 +30,7 @@ const characterConfig = {
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_walk.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
-      speed: 20,
+      speed: 200,
     },
     hurt: {
       frames: 3,
@@ -69,7 +69,7 @@ const characterConfig = {
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Walk-Sheet.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
-      speed: 20,
+      speed: 200,
     },
     hurt: {
       frames: 4,
@@ -108,7 +108,7 @@ const characterConfig = {
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Walk.png",
       originalFrameWidth: 120,
       originalFrameHeight: 120,
-      speed: 50,
+      speed: 200,
     },
     hurt: {
       frames: 4,
@@ -185,10 +185,10 @@ class Player {
     this.width = 200; // Feste Zielgröße
     this.height = 200; // Feste Zielgröße
     this.action = 'idle';
-    this.speed = 3;
+    this.speed = 5;
     this.velocityY = 0;
     this.isJumping = false;
-    this.health = 100;
+    this.health = 300;
     this.canAttack = true;
     this.currentFrame = 0; // Frame für Animation
     this.jumpStrength = -6; // Negative Kraft für den Sprung
@@ -259,7 +259,7 @@ function updateAnimationFrames(currentTime) {
 
     // Player 1
     const player1Config = characterConfig[player1.character][player1.action || "idle"];
-    const player1Speed = player1Config.speed;
+    const player1Speed = player1Config.speed || 100;
   
     if (currentTime - player1.lastFrameUpdateTime >= player1Speed) {
       if (player1.action === 'attack1' || player1.action === 'attack2') {
@@ -273,7 +273,7 @@ function updateAnimationFrames(currentTime) {
   
     // Spieler 2
     const player2Config = characterConfig[player2.character][player2.action || "idle"];
-    const player2Speed = player2Config.speed;
+    const player2Speed = player2Config.speed || 100;
   
     if (currentTime - player2.lastFrameUpdateTime >= player2Speed) {
       if (player2.action === 'attack1' || player2.action === 'attack2') {
@@ -417,7 +417,7 @@ function update() {
   }
 
   // Angriff für Spieler 2
-  if (keys["2"] && player2.canAttack) {
+  if (keys["1"] && player2.canAttack) {
     triggerAttack(player2);
   }
   function triggerAttack(player) {
@@ -462,7 +462,7 @@ function handleAnimations() {
     action,
     frames,
     canAttackDelay,
-    resetDelay // keine verwendung?
+    resetDelay
   ) {
     if (keys[key] && player.canAttack) {
       player.action = action;
@@ -504,6 +504,7 @@ function handleCollisions() {
     player2.health -= player1.damageAttack1;
     if (player2.health < 0) player2.health = 0;
   }
+
   if (player2.hitbox.active && checkHitboxOverlap(player2.hitbox, player1)) {
     player1.health -= player2.damageAttack1;
     if (player1.health < 0) player1.health = 0;
@@ -529,8 +530,8 @@ function updateHitbox(player) {
 
   if (player.action === "attack1") {
     player.hitbox.active = true;
-    player.hitbox.x = player.x + player.width / 2 + 65;
-    player.hitbox.y = player.y + 100;
+    player.hitbox.x = player.x + player.width / 2;
+    player.hitbox.y = player.y + 20;
     player.hitbox.width = 30;
     player.hitbox.height = 60;
   } else if (player.action === "attack2") {
@@ -557,35 +558,12 @@ function drawHitbox(player) {
   }
 }
 
-const player1HealthBar = document.getElementById("player1-health");
-const player2HealthBar = document.getElementById("player2-health");
-
 // Gesundheitsbalken aktualisieren
-function updateHealth(player, health) {
-  if (player === 1) {
-    player1.health = Math.max(0, Math.min(health, 100));
-    player1HealthBar.style.transform = `scaleX(${player1.health / 100})`;
-  } else if (player === 2) {
-    player2.health = Math.max(0, Math.min(health, 100));
-    player2HealthBar.style.transform = `scaleX(${player2.health / 100})`;
-  }
-
-  if(player1.health > 60){
-    player1HealthBar.style.background = "linear-gradient(90deg, rgba(80,80,80,1) 0%, rgba(50,157,0,1) 56%)";
-  } else if(player1.health > 30){
-    
-    player1HealthBar.style.background = "linear-gradient(90deg, rgba(80,80,80,1) 0%, rgba(255,149,0,1) 56%)"
-  } else {
-    player1HealthBar.style.background = "linear-gradient(90deg, rgba(80,80,80,1) 0%, rgba(167,0,0,1) 64%)";
-  }
-
-  if(player2.health > 60){
-    player2HealthBar.style.background = "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(50,157,0,1) 56%)";
-  } else if(player2.health > 30){
-    player2HealthBar.style.background = "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(255,149,0,1) 56%)";
-  } else {
-    player2HealthBar.style.background = "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(167,0,0,1) 64%)";
-  }
+function updateHealth() {
+  const player1HealthBar = document.getElementById("player1-health");
+  const player2HealthBar = document.getElementById("player2-health");
+  player1HealthBar.style.width = `${(player1.health / 300) * 100}%`;
+  player2HealthBar.style.width = `${(player2.health / 300) * 100}%`;
 }
 // Aktion zurücksetzen
 function resetAction(player, delay) {
@@ -602,12 +580,13 @@ function debugPlayer(player) {
   ctx.fillText(`Action: ${player.action}`, player.x, player.y - 10);
   ctx.fillText(`Frame: ${player.currentFrame}`, player.x, player.y - 25);
 }
-// um einblick über frames und aktionen zu bekommen
+
+// Füge dies in die gameLoop ein:
 debugPlayer(player1);
 debugPlayer(player2);
 
+// Spiel-Loop
 let lastSpriteUpdateTime = 0;
-let gameover = false;
 let isPaused = false;
 
 function gameLoop(currentTime) {
@@ -628,11 +607,6 @@ function gameLoop(currentTime) {
     updateHitbox(player1);
     updateHitbox(player2);
 
-    // 6. Healthbars aktualisieren
-
-    updateHealth(1, player1.health);
-    updateHealth(2, player2.health);
-
     // 6. Spieler zeichnen
     drawPlayer(player1);
     drawPlayer(player2);
@@ -650,74 +624,38 @@ function gameLoop(currentTime) {
   }
 
   // 10. Nächsten Frame anfordern
-  if(gameover === false){
-    requestAnimationFrame(gameLoop);
-  }
+  requestAnimationFrame(gameLoop);
 }
 
 requestAnimationFrame(gameLoop);
 
-let timer = 120;
-    const timerDisplay = document.getElementById('timer');
-    const div = timerDisplay.parentElement
-    
+{
+  let timer = 120;
+  const timerDisplay = document.getElementById("timer");
+  const div = timerDisplay.parentElement;
 
-    if (timerDisplay) { // Vermeide Fehler, wenn das Element fehltt
-        const timerInterval = setInterval(() => {
-            if (timer > 0 && isPaused === false) {
-                timer--;
-                timerDisplay.textContent = timer;
-            } else if(timer > 0 && isPaused === true) {} else {
-                clearInterval(timerInterval);  
-                if(player1.health > player2.health){
-                    div.textContent = "PLAYER 1 WON!"
-                    gameover = true;
-                }else if(player2.health > player1.health){
-                    div.textContent = 'PLAYER 2 WON!';
-                    gameover = true;
-                }else{
-                    div.textContent = "TIME OVER IT'S A TIE!"
-                    gameover = true;
-                }
-            }
-        }, 1000);
-    } else {
-        console.warn('Timer-Element nicht gefunden!');
-}
-
-const pause = document.getElementById('pause')
-pause.addEventListener('click', pauseGame);
-
-function pauseGame() {
-  if (!isPaused) {
-    // Create a pause overlay instead of replacing the entire container
-    const pauseOverlay = document.createElement('div');
-    pauseOverlay.id = 'pause-screen';
-    pauseOverlay.innerHTML = `
-      <h1>PAUSED</h1>
-      <button id="resume">resume</button>
-      <button id="restart">restart</button>
-    `;
-
-    document.getElementById('game-container').appendChild(pauseOverlay);
-    pause.textContent = 'play';
-    isPaused = true;
-  } else {
-    // Remove only the pause screen, keeping the game container intact
-    const pauseScreen = document.getElementById('pause-screen');
-    if (pauseScreen) {
-      pauseScreen.remove();
-    }
-    pause.textContent = "pause";
-    isPaused = false;
+  if (timerDisplay) {
+    const timerInterval = setInterval(() => {
+      if (timer > 0 && !isPaused) {
+        timer--;
+        timerDisplay.textContent = timer;
+      } else if (timer <= 0) {
+        clearInterval(timerInterval);
+        if (player1.health > player2.health) {
+          div.textContent = "PLAYER 1 WON!";
+        } else if (player2.health > player1.health) {
+          div.textContent = "PLAYER 2 WON!";
+        } else {
+          div.textContent = "TIME OVER! IT'S A TIE!";
+        }
+      }
+    }, 1000);
   }
 }
 
-// Modify the event listener to work with the new pause overlay
-document.getElementById('game-container').addEventListener('click', (e) => {
-  if (e.target.id === 'resume') {
-    pauseGame(); // This will remove the pause screen
-  } else if (e.target.id === 'restart') {
-    location.href = 'index.html'; // da es statisch is wird das spiel neu gestarten / not the best way
-  }
+// Pause-Funktion
+const pause = document.getElementById("pause");
+pause.addEventListener("click", () => {
+  isPaused = !isPaused;
+  pause.textContent = isPaused ? "play" : "pause";
 });
