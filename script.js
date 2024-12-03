@@ -630,32 +630,69 @@ function gameLoop(currentTime) {
 requestAnimationFrame(gameLoop);
 
 {
-  let timer = 120;
-  const timerDisplay = document.getElementById("timer");
-  const div = timerDisplay.parentElement;
+    let timer = 120;
+    const timerDisplay = document.getElementById('timer');
+    const div = timerDisplay.parentElement
+    
 
-  if (timerDisplay) {
-    const timerInterval = setInterval(() => {
-      if (timer > 0 && !isPaused) {
-        timer--;
-        timerDisplay.textContent = timer;
-      } else if (timer <= 0) {
-        clearInterval(timerInterval);
-        if (player1.health > player2.health) {
-          div.textContent = "PLAYER 1 WON!";
-        } else if (player2.health > player1.health) {
-          div.textContent = "PLAYER 2 WON!";
-        } else {
-          div.textContent = "TIME OVER! IT'S A TIE!";
-        }
-      }
-    }, 1000);
+    if (timerDisplay) { // Vermeide Fehler, wenn das Element fehltt
+        const timerInterval = setInterval(() => {
+            if (timer > 0 && isPaused === false) {
+                timer--;
+                timerDisplay.textContent = timer;
+            } else if(timer > 0 && isPaused === true) {} else {
+                clearInterval(timerInterval);  
+                if(player1.health > player2.health){
+                    div.textContent = "PLAYER 1 WON!"
+                }else if(player2.health > player1.health){
+                    div.textContent = 'PLAYER 2 WON!';
+                }else{
+                    div.textContent = "TIME OVER IT'S A TIE!"
+                }
+            }
+        }, 1000);
+    } else {
+        console.warn('Timer-Element nicht gefunden!');
+    }
+}
+
+const pause = document.getElementById('pause')
+pause.addEventListener('click', pauseGame);
+
+function pauseGame(){
+  if(isPaused === false){
+    document.getElementById('game-canvas').style.display = 'none';
+    document.getElementById('game-container').innerHTML = `
+    <div id="pause-screen">
+      <h1>PAUSED</h1>
+      <button id="resume">resume</button>
+      <button id="restart">restart</button>
+      <button id="quit">quit</button>
+    </div>
+    `
+    pause.textContent = 'play';
+    isPaused = true;
+    
+  }else{
+    pause.textContent = "pause"
+    document.getElementById('game-canvas').style.display = 'block';
+    document.getElementById('pause-screen').remove();
+    isPaused = false;
   }
 }
 
-// Pause-Funktion
-const pause = document.getElementById("pause");
-pause.addEventListener("click", () => {
-  isPaused = !isPaused;
-  pause.textContent = isPaused ? "play" : "pause";
+
+document.getElementById('game-container').addEventListener('click', (e) => {
+  if(e.target.id === 'resume'){
+    pauseGame();
+  }else if(e.target.id === 'restart'){
+    pauseGame();
+    timer = 120;
+    player1.health = 300;
+    player2.health = 300;
+    player1.x = 100;
+    player2.x = 500;
+  }else if(e.target.id === 'quit'){
+    location.href = 'index.html';
+  }
 });
