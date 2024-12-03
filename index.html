@@ -11,15 +11,25 @@
 <body>
     <div id="game-container">
         <div id="pause">pause</div>
-        <div id="topbar">
-            <div class="health-container">
-                <div class="playerHealth" id="player1-health"></div>
+        <div id="ui">
+            <!-- Player 1 Health Bar -->
+            <div class="health-bar-container" id="player1-bar">
+                <span class="label">Player 1</span>
+                <div class="health-bar">
+                    <div class="health-fill" id="player1-health"></div>
+                </div>
             </div>
             <div id="timer">120</div>
-            <div class="health-container">
-                <div class="playerHealth" id="player2-health"></div>
+
+            <!-- Player 2 Health Bar -->
+            <div class="health-bar-container" id="player2-bar">
+                <span class="label">Player 2</span>
+                <div class="health-bar">
+                    <div class="health-fill" id="player2-health"></div>
+                </div>
             </div>
         </div>
+
         <canvas id="game-canvas"></canvas>
     </div>
 
