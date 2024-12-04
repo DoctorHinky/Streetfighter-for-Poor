@@ -24,6 +24,7 @@ const characterConfig = {
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 100,
     },
     walk: {
       frames: 6,
@@ -37,32 +38,37 @@ const characterConfig = {
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_Hurt.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 100,
     },
     attack1: {
       frames: 8,
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_attack3.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 100,
     },
     attack2: {
       frames: 9,
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_attack1.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 100,
     },
     jump: {
       frames: 10,
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_Jump.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 200,
     },
   },
   battingGirl: {
     idle: {
-      frames: 15,
+      frames: 12,
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Idle-Sheet.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 100,
     },
     walk: {
       frames: 6,
@@ -76,38 +82,43 @@ const characterConfig = {
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Hurt-Sheet.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 100,
     },
     attack1: {
       frames: 5,
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_attack01-Sheet.png",
       originalFrameWidth: 110,
       originalFrameHeight: 100,
+      speed: 100,
     },
     attack2: {
       frames: 11,
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_attack03-Sheet.png",
       originalFrameWidth: 110,
       originalFrameHeight: 100,
+      speed: 100,
     },
     jump: {
       frames: 4,
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Jump-Sheet.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
+      speed: 400,
     },
   },
   bruteArms: {
     idle: {
       frames: 7,
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Idle.png",
-      originalFrameWidth: 120,
-      originalFrameHeight: 120,
+      originalFrameWidth: 100,
+      originalFrameHeight: 101,
+      speed: 100,
     },
     walk: {
       frames: 6,
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Walk.png",
-      originalFrameWidth: 120,
-      originalFrameHeight: 120,
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
       speed: 200,
     },
     hurt: {
@@ -115,24 +126,28 @@ const characterConfig = {
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Hurt.png",
       originalFrameWidth: 120,
       originalFrameHeight: 120,
+      speed: 100,
     },
     attack1: {
       frames: 6,
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_attack01.png",
-      originalFrameWidth: 150,
-      originalFrameHeight: 120,
+      originalFrameWidth: 160,
+      originalFrameHeight: 128,
+      speed: 100,
     },
     attack2: {
       frames: 5,
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_attack04.png",
       originalFrameWidth: 160,
-      originalFrameHeight: 120,
+      originalFrameHeight: 128,
+      speed: 100,
     },
     jump: {
-      frames: 4,
+      frames: 10,
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Jump.png",
       originalFrameWidth: 120,
-      originalFrameHeight: 140,
+      originalFrameHeight: 128,
+      speed: 200,
     },
   },
 };
@@ -181,20 +196,20 @@ class Player {
   constructor(x, character) {
     this.x = x;
     this.y = 150;
-    this.character = character || 'bancho'; // Standardcharakter
-    this.width = 200; // Feste Zielgröße
-    this.height = 200; // Feste Zielgröße
-    this.action = 'idle';
-    this.speed = 5;
+    this.character = character || "bancho"; // Standardcharakter
+    this.width = 200;
+    this.height = 200;
+    this.action = "idle";
+    this.speed = 3;
     this.velocityY = 0;
     this.isJumping = false;
     this.health = 300;
     this.canAttack = true;
-    this.currentFrame = 0; // Frame für Animation
-    this.jumpStrength = -6; // Negative Kraft für den Sprung
-    this.gravity = 0.1; // Schwerkraft
+    this.currentFrame = 0;
+    this.jumpStrength = -6;
+    this.gravity = 0.1;
     this.lastFrameUpdateTime = 0;
-    // Hitbox-Initialisierung
+    this.facing = "right"; // Neue Eigenschaft: Blickrichtung
     this.hitbox = {
       active: false,
       x: this.x + this.width,
@@ -218,73 +233,63 @@ const player2 = new Player(500, "battingGirl");
 function drawPlayer(player) {
   const config = characterConfig[player.character][player.action || "idle"];
   const sprite = config.sprite;
-  if (player.action === "jump") {
-    console.log(
-      `Drawing jump animation: Frame ${player.currentFrame}, Sprite: ${config.src}`
+
+  if (!sprite) return; // Verlasse die Funktion, falls kein Sprite vorhanden ist
+
+  ctx.save(); // Zustand speichern
+
+  // Spiegeln, falls der Spieler nach links schaut
+  if (player.facing === "left") {
+    ctx.scale(-1, 1); // Horizontal spiegeln
+    ctx.drawImage(
+      sprite,
+      player.currentFrame * config.originalFrameWidth,
+      0,
+      config.originalFrameWidth,
+      config.originalFrameHeight,
+      -player.x - player.width, // Negative Koordinaten wegen Spiegelung
+      player.y,
+      player.width,
+      player.height
+    );
+  } else {
+    ctx.drawImage(
+      sprite,
+      player.currentFrame * config.originalFrameWidth,
+      0,
+      config.originalFrameWidth,
+      config.originalFrameHeight,
+      player.x,
+      player.y,
+      player.width,
+      player.height
     );
   }
 
-  if (!sprite) {
-    console.error(`Sprite is undefined for action ${player.action}`);
-    return;
-  }
-
-  if (!sprite.complete) {
-    console.warn(`Sprite not loaded for action ${player.action}`);
-    return;
-  }
-
-  console.log(
-    `Drawing ${player.character} action: ${player.action}, Frame: ${player.currentFrame}, Sprite: ${config.src}`
-  );
-
-  ctx.drawImage(
-    sprite,
-    player.currentFrame * config.originalFrameWidth,
-    0,
-    config.originalFrameWidth,
-    config.originalFrameHeight,
-    player.x,
-    player.y,
-    player.width,
-    player.height
-  );
+  ctx.restore(); // Zustand wiederherstellen
 }
 
 // Animation aktualisieren
 function updateAnimationFrames(currentTime) {
-  const animationSpeed = 100;
+  const animationSpeed = 100; // Allgemeine Animationsgeschwindigkeit (falls global verwendet)
   if (currentTime - lastSpriteUpdateTime >= animationSpeed) {
     lastSpriteUpdateTime = currentTime;
 
     // Player 1
     const player1Config = characterConfig[player1.character][player1.action || "idle"];
-    const player1Speed = player1Config.speed || 100;
-  
+    const player1Speed = player1Config.speed; // Ohne Fallback
     if (currentTime - player1.lastFrameUpdateTime >= player1Speed) {
-      if (player1.action === 'attack1' || player1.action === 'attack2') {
-        player1.currentFrame = (player1.currentFrame + 1) % player1Config.frames;
-      } else {
-        player1.currentFrame = (player1.currentFrame + 1) % player1Config.frames;
-      }
-      player1.lastFrameUpdateTime = currentTime; // Timer aktualisieren
+      player1.currentFrame = (player1.currentFrame + 1) % player1Config.frames;
+      player1.lastFrameUpdateTime = currentTime;
     }
-  
-  
-    // Spieler 2
+
+    // Player 2
     const player2Config = characterConfig[player2.character][player2.action || "idle"];
-    const player2Speed = player2Config.speed || 100;
-  
+    const player2Speed = player2Config.speed; // Ohne Fallback
     if (currentTime - player2.lastFrameUpdateTime >= player2Speed) {
-      if (player2.action === 'attack1' || player2.action === 'attack2') {
-        player2.currentFrame = (player2.currentFrame + 1) % player2Config.frames;
-      } else {
-        player2.currentFrame = (player2.currentFrame + 1) % player2Config.frames;
-      }
-      player2.lastFrameUpdateTime = currentTime; // Timer aktualisieren
+      player2.currentFrame = (player2.currentFrame + 1) % player2Config.frames;
+      player2.lastFrameUpdateTime = currentTime;
     }
-  
-    lastSpriteUpdateTime = currentTime;
   }
 }
 const keys = {};
@@ -295,121 +300,155 @@ window.addEventListener("keyup", (e) => {
   keys[e.key] = false;
 });
 
-// Bewegung und Sprunglogik
 function update() {
   // Bewegung von Spieler 1
-  // Bewegung von Spieler 1
+  if (player1.x < player2.x) {
+    player1.facing = "right";
+    player2.facing = "left";
+  } else {
+    player1.facing = "left";
+    player2.facing = "right";
+  }
   if (!player1.isJumping && player1.canAttack && keys["j"]) {
-    triggerAttack(player1); // Vorrang für Angriff
+    triggerAttack(player1, "attack1");
+  } else if (!player1.isJumping && player1.canAttack && keys["k"]) {
+    triggerAttack(player1, "attack2");
   } else {
     if (keys["a"]) {
       player1.x -= player1.speed;
-      if (!player1.isJumping) player1.action = "walk";
       if (checkModelOverlap(player1, player2)) {
-        player1.x += player1.speed; // Bewegung rückgängig machen
+        player1.x += player1.speed;
+      } else {
+        player1.action = "walk";
       }
     }
     if (keys["d"]) {
       player1.x += player1.speed;
-      if (!player1.isJumping) player1.action = "walk";
       if (checkModelOverlap(player1, player2)) {
-        player1.x -= player1.speed; // Bewegung rückgängig machen
+        player1.x -= player1.speed;
+      } else {
+        player1.action = "walk";
       }
     }
     if (!keys["a"] && !keys["d"] && !player1.isJumping && player1.canAttack) {
-      player1.action = "idle"; // Zurück zur Idle-Animation
-    }
-  }
-
-  // Bewegung von Spieler 2
-  if (!player2.isJumping && player2.canAttack && keys["2"]) {
-    triggerAttack(player2); // Vorrang für Angriff
-  } else {
-    if (keys["ArrowLeft"]) {
-      player2.x -= player2.speed;
-      if (!player2.isJumping) player2.action = "walk";
-      if (checkModelOverlap(player1, player2)) {
-        player2.x += player2.speed; // Bewegung rückgängig machen
-      }
-    }
-    if (keys["ArrowRight"]) {
-      player2.x += player2.speed;
-      if (!player2.isJumping) player2.action = "walk";
-      if (checkModelOverlap(player1, player2)) {
-        player2.x -= player2.speed; // Bewegung rückgängig machen
-      }
-    }
-    if (!keys["ArrowLeft"] && !keys["ArrowRight"] && !player2.isJumping && player2.canAttack) {
-      player2.action = "idle"; // Zurück zur Idle-Animation
+      player1.action = "idle";
     }
   }
 
   // Sprunglogik für Spieler 1
   if (keys["w"] && !player1.isJumping) {
-    console.log("Player 1 starts jumping");
-    player1.velocityY = player1.jumpStrength;
-    player1.isJumping = true;
-    player1.action = "jump"; // Setze Animation auf "jump"
-    player1.currentFrame = 0; // Starte die Sprunganimation
+    const nextY = player1.y + player1.jumpStrength;
+    if (!checkModelOverlap({ ...player1, y: nextY }, player2)) {
+      player1.velocityY = player1.jumpStrength;
+      player1.isJumping = true;
+      player1.action = "jump";
+      player1.currentFrame = 0;
+    }
   }
 
   if (player1.isJumping) {
     const jumpConfig = characterConfig[player1.character].jump;
-
-    // Aktualisiere Position und Geschwindigkeit
     player1.y += player1.velocityY;
     player1.velocityY += player1.gravity;
 
-    // Animation während des Aufstiegs
+    if (checkModelOverlap(player1, player2)) {
+      resolveVerticalOverlap(player1, player2);
+    }
+
     if (player1.velocityY < 0) {
-      // Spieler steigt auf
-      const midFrame = Math.floor(jumpConfig.frames / 2); // Hälfte der Frames
+      const midFrame = Math.floor(jumpConfig.frames / 2);
       if (player1.currentFrame < midFrame) {
         player1.currentFrame++;
       }
     } else if (player1.velocityY > 0) {
-      // Spieler fällt
       if (player1.currentFrame < jumpConfig.frames - 1) {
         player1.currentFrame++;
       }
     }
 
-    // Spieler landet
     if (player1.y >= 150) {
       player1.y = 150;
       player1.velocityY = 0;
       player1.isJumping = false;
-      player1.action = "idle"; // Zurück zur Idle-Animation
-      player1.currentFrame = 0; // Frame zurücksetzen
+      player1.action = "idle";
+      player1.currentFrame = 0;
     }
   }
 
-  // Sprunglogik für Spieler 2
+  // Bewegung und Sprunglogik für Spieler 2 (analog zu Spieler 1)
+  if (!player2.isJumping && player2.canAttack && keys["1"]) {
+    triggerAttack(player2, "attack1");
+  } else if (!player2.isJumping && player2.canAttack && keys["2"]) {
+    triggerAttack(player2, "attack2");
+  } else {
+    if (keys["ArrowLeft"]) {
+      player2.x -= player2.speed;
+      if (checkModelOverlap(player2, player1)) {
+        player2.x += player2.speed;
+      } else {
+        player2.action = "walk";
+      }
+    }
+    if (keys["ArrowRight"]) {
+      player2.x += player2.speed;
+      if (checkModelOverlap(player2, player1)) {
+        player2.x -= player2.speed;
+      } else {
+        player2.action = "walk";
+      }
+    }
+    if (
+      !keys["ArrowLeft"] &&
+      !keys["ArrowRight"] &&
+      !player2.isJumping &&
+      player2.canAttack
+    ) {
+      player2.action = "idle";
+    }
+  }
+
   if (keys["ArrowUp"] && !player2.isJumping) {
-    player2.velocityY = player2.jumpStrength;
-    player2.isJumping = true;
-    player2.action = "jump"; // Setze Animation auf "jump"
-    player2.currentFrame = 0; // Starte die Sprunganimation
+    const nextY = player2.y + player2.jumpStrength;
+    if (!checkModelOverlap({ ...player2, y: nextY }, player1)) {
+      player2.velocityY = player2.jumpStrength;
+      player2.isJumping = true;
+      player2.action = "jump";
+      player2.currentFrame = 0;
+    }
   }
 
   if (player2.isJumping) {
+    const jumpConfig = characterConfig[player2.character].jump;
     player2.y += player2.velocityY;
     player2.velocityY += player2.gravity;
 
-    // Aktualisiere die Animation basierend auf der Frameanzahl
-    const jumpConfig = characterConfig[player2.character].jump;
-    if (player2.currentFrame < jumpConfig.frames - 1) {
-      player2.currentFrame++;
+    if (checkModelOverlap(player2, player1)) {
+      resolveVerticalOverlap(player2, player1);
+    }
+
+    if (player2.velocityY < 0) {
+      const midFrame = Math.floor(jumpConfig.frames / 2);
+      if (player2.currentFrame < midFrame) {
+        player2.currentFrame++;
+      }
+    } else if (player2.velocityY > 0) {
+      if (player2.currentFrame < jumpConfig.frames - 1) {
+        player2.currentFrame++;
+      }
     }
 
     if (player2.y >= 150) {
-      // Spieler landet wieder
       player2.y = 150;
       player2.velocityY = 0;
       player2.isJumping = false;
-      player2.action = "idle"; // Zurück zur Idle-Animation
+      player2.action = "idle";
+      player2.currentFrame = 0;
     }
   }
+  // Begrenzung der Spieler im Canvas
+  player1.x = Math.max(-40, Math.min(canvas.width +50 - player1.width, player1.x));
+  player2.x = Math.max(-40, Math.min(canvas.width +50 - player2.width, player2.x));
+}
 
   // Angriff für Spieler 1
   if (keys["j"] && player1.canAttack) {
@@ -420,38 +459,57 @@ function update() {
   if (keys["1"] && player2.canAttack) {
     triggerAttack(player2);
   }
-  function triggerAttack(player) {
-    const attackConfig = characterConfig[player.character].attack1; // Aktuelle Konfiguration
-    player.action = 'attack1'; // Setze Aktion auf 'attack1'
+  function triggerAttack(player, attackType) {
+    const attackConfig = characterConfig[player.character][attackType]; // Konfiguration der Attacke
+    player.action = attackType; // Setze Aktion auf die spezifische Attacke
     player.currentFrame = 0; // Starte die Animation von vorne
-    player.canAttack = false; // Deaktiviere weitere Angriffe
-
+    player.canAttack = false; // Deaktiviere weitere Angriffe während der Animation
+  
     // Berechne die Dauer der Animation
-    const config = characterConfig[player.character].attack1;
     const animationDuration = attackConfig.frames * (attackConfig.speed || 100); // 100ms pro Frame
-
+  
     // Setze Aktion nach der Animation zurück
     setTimeout(() => {
       if (!player.isJumping && !keys["a"] && !keys["d"]) {
-        player.action = 'idle'; // Zurück zu Idle, falls keine Bewegung oder Sprung
+        player.action = "idle"; // Zurück zu Idle, falls keine Bewegung oder Sprung
       }
       player.canAttack = true; // Erlaube neue Angriffe
     }, animationDuration);
-  }
+  
 
-  // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(-18, Math.min(canvas.width - player1.width, player1.x));
-  player2.x = Math.max(-18, Math.min(canvas.width - player2.width, player2.x));
+}
+function resolveVerticalOverlap(player1, player2) {
+  const overlapMargin = 10; // Sicherheitsabstand
+
+  // Spieler sind vertikal überlappend
+  if (
+    player1.y + player1.height > player2.y &&
+    player1.y < player2.y + player2.height
+  ) {
+    // Spieler 1 ist links von Spieler 2
+    if (player1.x < player2.x) {
+      player1.x -= overlapMargin; // Spieler 1 nach links verschieben
+      player2.x += overlapMargin; // Spieler 2 nach rechts verschieben
+    } else {
+      player1.x += overlapMargin; // Spieler 1 nach rechts verschieben
+      player2.x -= overlapMargin; // Spieler 2 nach links verschieben
+    }
+  }
 }
 //Überprüfe Modellkollision
-const margin = 42; // Margin to shrink the hitbox
+const margin = 60; // Adjust this margin as needed
+
 function checkModelOverlap(player1, player2) {
-  return (
+  const overlapHorizontal =
     player1.x + margin < player2.x + player2.width - margin &&
-    player1.x + player1.width - margin > player2.x + margin &&
+    player1.x + player1.width - margin > player2.x + margin;
+
+  const overlapVertical =
     player1.y + margin < player2.y + player2.height - margin &&
-    player1.y + player1.height - margin > player2.y + margin
-  );
+    player1.y + player1.height - margin > player2.y + margin;
+
+  // Overlap occurs only if both horizontal and vertical overlaps are true
+  return overlapHorizontal && overlapVertical;
 }
 
 // Aktionen verwalten
