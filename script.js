@@ -196,7 +196,7 @@ class Player {
   constructor(x, character) {
     this.x = x;
     this.y = 150;
-    this.character = character || "bancho"; // Standardcharakter
+    this.character = character || "bancho";
     this.width = 200;
     this.height = 200;
     this.action = "idle";
@@ -209,13 +209,19 @@ class Player {
     this.jumpStrength = -6;
     this.gravity = 0.1;
     this.lastFrameUpdateTime = 0;
-    this.facing = "right"; // Neue Eigenschaft: Blickrichtung
-    this.hitbox = {
-      active: false,
-      x: this.x + this.width,
-      y: this.y,
-      width: 0,
-      height: 0,
+    this.facing = "right";
+
+    // Separate Hitboxes
+    this.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
+    this.defenderHitbox = { x: this.x + 50, y: this.y + 50, width: 100, height: 100 };
+  }
+
+  updateDefenderHitbox() {
+    this.defenderHitbox = {
+      x: this.x + 50,
+      y: this.y + 50,
+      width: this.width - 100, // Beispiel: kleinere Breite
+      height: this.height - 100, // Beispiel: kleinere Höhe
     };
   }
 
@@ -445,6 +451,8 @@ function update() {
       player2.currentFrame = 0;
     }
   }
+  player1.updateDefenderHitbox();
+  player2.updateDefenderHitbox();
   // Begrenzung der Spieler im Canvas
   player1.x = Math.max(-40, Math.min(canvas.width +50 - player1.width, player1.x));
   player2.x = Math.max(-40, Math.min(canvas.width +50 - player2.width, player2.x));
@@ -460,24 +468,43 @@ function update() {
     triggerAttack(player2);
   }
   function triggerAttack(player, attackType) {
-    const attackConfig = characterConfig[player.character][attackType]; // Konfiguration der Attacke
-    player.action = attackType; // Setze Aktion auf die spezifische Attacke
-    player.currentFrame = 0; // Starte die Animation von vorne
-    player.canAttack = false; // Deaktiviere weitere Angriffe während der Animation
+    const attackConfig = characterConfig[player.character][attackType];
+    player.action = attackType;
+    player.currentFrame = 0;
+    player.canAttack = false;
+    player.damageDealt = false;
   
-    // Berechne die Dauer der Animation
-    const animationDuration = attackConfig.frames * (attackConfig.speed || 100); // 100ms pro Frame
+    // Set attack hitbox dimensions
+    if (attackType === "attack1") {
+      player.attackHitbox = {
+        x: player.facing === "right" ? player.x + player.width : player.x - 60,
+        y: player.y + 20,
+        width: 60,
+        height: 60,
+      };
+    } else if (attackType === "attack2") {
+      player.attackHitbox = {
+        x: player.facing === "right" ? player.x + player.width : player.x - 100,
+        y: player.y,
+        width: 100,
+        height: 100,
+      };
+    }
   
-    // Setze Aktion nach der Animation zurück
+    const damage = attackType === "attack1" ? 10 : 20; // Unterschiedlicher Schaden
+  
+    const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
+    const interval = setInterval(() => {
+      checkAttackConnect(player, player === player1 ? player2 : player1, damage);
+    }, 50);
+  
     setTimeout(() => {
-      if (!player.isJumping && !keys["a"] && !keys["d"]) {
-        player.action = "idle"; // Zurück zu Idle, falls keine Bewegung oder Sprung
-      }
-      player.canAttack = true; // Erlaube neue Angriffe
+      clearInterval(interval);
+      player.action = "idle";
+      player.canAttack = true;
+      player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
     }, animationDuration);
-  
-
-}
+  }
 function resolveVerticalOverlap(player1, player2) {
   const overlapMargin = 10; // Sicherheitsabstand
 
@@ -497,7 +524,7 @@ function resolveVerticalOverlap(player1, player2) {
   }
 }
 //Überprüfe Modellkollision
-const margin = 60; // Adjust this margin as needed
+const margin = 80; // Adjust this margin as needed
 
 function checkModelOverlap(player1, player2) {
   const overlapHorizontal =
@@ -512,6 +539,27 @@ function checkModelOverlap(player1, player2) {
   return overlapHorizontal && overlapVertical;
 }
 
+function checkAttackConnect(attacker, defender, damage) {
+  const hitbox = attacker.attackHitbox;
+  const defenderBox = defender.defenderHitbox;
+
+  const overlap =
+    hitbox.x < defenderBox.x + defenderBox.width &&
+    hitbox.x + hitbox.width > defenderBox.x &&
+    hitbox.y < defenderBox.y + defenderBox.height &&
+    hitbox.y + hitbox.height > defenderBox.y;
+
+  if (overlap && !attacker.damageDealt) {
+    defender.health -= damage;
+    attacker.damageDealt = true;
+    console.log(`${attacker.character} trifft ${defender.character} für ${damage} Schaden!`);
+  }
+}
+function drawHitbox(hitbox, color = "blue") {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+}
 // Aktionen verwalten
 function handleAnimations() {
   function handlePlayerAction(
@@ -556,72 +604,34 @@ function handleAnimations() {
   );
 }
 
-// Kollision mit Hitbox
-function handleCollisions() {
-  if (player1.hitbox.active && checkHitboxOverlap(player1.hitbox, player2)) {
-    player2.health -= player1.damageAttack1;
-    if (player2.health < 0) player2.health = 0;
-  }
 
-  if (player2.hitbox.active && checkHitboxOverlap(player2.hitbox, player1)) {
-    player1.health -= player2.damageAttack1;
-    if (player1.health < 0) player1.health = 0;
-  }
-}
 
-// Überprüfe Hitbox-Kollision
-function checkHitboxOverlap(hitbox, player) {
-  return (
-    hitbox.x < player.x + player.width &&
-    hitbox.x + hitbox.width > player.x &&
-    hitbox.y < player.y + player.height &&
-    hitbox.y + hitbox.height > player.y
-  );
-}
 
-// Hitbox-Position aktualisieren
-function updateHitbox(player) {
-  if (!player.hitbox) {
-    console.error(`Hitbox for player ${player.character} is undefined.`);
-    return;
-  }
 
-  if (player.action === "attack1") {
-    player.hitbox.active = true;
-    player.hitbox.x = player.x + player.width / 2;
-    player.hitbox.y = player.y + 20;
-    player.hitbox.width = 30;
-    player.hitbox.height = 60;
-  } else if (player.action === "attack2") {
-    player.hitbox.active = true;
-    player.hitbox.x = player.x + player.width / 2;
-    player.hitbox.y = player.y + 20;
-    player.hitbox.width = 40;
-    player.hitbox.height = 80;
-  } else {
-    player.hitbox.active = false;
-  }
-}
+
 // Hitbox zeichnen (Debugging)
-function drawHitbox(player) {
-  if (player.hitbox.active) {
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(
-      player.hitbox.x,
-      player.hitbox.y,
-      player.hitbox.width,
-      player.hitbox.height
-    );
-  }
-}
+
 
 // Gesundheitsbalken aktualisieren
 function updateHealth() {
   const player1HealthBar = document.getElementById("player1-health");
   const player2HealthBar = document.getElementById("player2-health");
+
   player1HealthBar.style.width = `${(player1.health / 300) * 100}%`;
   player2HealthBar.style.width = `${(player2.health / 300) * 100}%`;
+
+  // Farben anpassen
+  player1HealthBar.style.background = player1.health > 60
+    ? "green"
+    : player1.health > 30
+    ? "orange"
+    : "red";
+
+  player2HealthBar.style.background = player2.health > 60
+    ? "green"
+    : player2.health > 30
+    ? "orange"
+    : "red";
 }
 // Aktion zurücksetzen
 function resetAction(player, delay) {
@@ -639,9 +649,7 @@ function debugPlayer(player) {
   ctx.fillText(`Frame: ${player.currentFrame}`, player.x, player.y - 25);
 }
 
-// Füge dies in die gameLoop ein:
-debugPlayer(player1);
-debugPlayer(player2);
+
 
 // Spiel-Loop
 let lastSpriteUpdateTime = 0;
@@ -661,21 +669,16 @@ function gameLoop(currentTime) {
     // 4. Spieleraktionen und Bewegungen ausführen
     update();
 
-    // 5. Hitboxen aktualisieren
-    updateHitbox(player1);
-    updateHitbox(player2);
 
     // 6. Spieler zeichnen
     drawPlayer(player1);
     drawPlayer(player2);
     debugPlayer(player1);
     debugPlayer(player2);
-    // 7. Hitboxen zeichnen (Debugging, optional)
-    drawHitbox(player1);
-    drawHitbox(player2);
-
-    // 8. Kollisionen prüfen
-    handleCollisions();
+    drawHitbox(player1.defenderHitbox, "blue"); // Player 1 Defender Hitbox
+    drawHitbox(player2.defenderHitbox, "blue"); // Player 2 Defender Hitbox
+    drawHitbox(player1.attackHitbox, "red");    // Player 1 Attack Hitbox
+    drawHitbox(player2.attackHitbox, "red");    // Player 2 Attack Hitbox
 
     // 9. Gesundheitsbalken und Statusanzeigen aktualisieren
     updateHealth();
