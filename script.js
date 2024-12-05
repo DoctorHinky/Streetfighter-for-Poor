@@ -46,13 +46,21 @@ const characterConfig = {
       originalFrameWidth: 100,
       originalFrameHeight: 100,
       speed: 100,
+      hitbox: { 
+      right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
+      left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
     },
+  },
     attack2: {
       frames: 9,
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_attack1.png",
       originalFrameWidth: 100,
       originalFrameHeight: 100,
       speed: 100,
+      hitbox: { 
+        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+      },
     },
     jump: {
       frames: 10,
@@ -60,6 +68,10 @@ const characterConfig = {
       originalFrameWidth: 100,
       originalFrameHeight: 100,
       speed: 200,
+    },
+    defenderHitbox: {
+      right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
+      left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
     },
   },
   battingGirl: {
@@ -90,6 +102,10 @@ const characterConfig = {
       originalFrameWidth: 110,
       originalFrameHeight: 100,
       speed: 100,
+      hitbox: { 
+        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+      },
     },
     attack2: {
       frames: 11,
@@ -97,6 +113,10 @@ const characterConfig = {
       originalFrameWidth: 110,
       originalFrameHeight: 100,
       speed: 100,
+      hitbox: { 
+        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+      },
     },
     jump: {
       frames: 4,
@@ -104,6 +124,10 @@ const characterConfig = {
       originalFrameWidth: 100,
       originalFrameHeight: 100,
       speed: 400,
+    },
+    defenderHitbox: {
+      right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
+      left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
     },
   },
   bruteArms: {
@@ -134,6 +158,10 @@ const characterConfig = {
       originalFrameWidth: 160,
       originalFrameHeight: 128,
       speed: 100,
+      hitbox: { 
+        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+      },
     },
     attack2: {
       frames: 5,
@@ -141,6 +169,10 @@ const characterConfig = {
       originalFrameWidth: 160,
       originalFrameHeight: 128,
       speed: 100,
+      hitbox: { 
+        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+      },
     },
     jump: {
       frames: 10,
@@ -148,6 +180,10 @@ const characterConfig = {
       originalFrameWidth: 120,
       originalFrameHeight: 128,
       speed: 200,
+    },
+    defenderHitbox: {
+      right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
+      left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
     },
   },
 };
@@ -213,18 +249,25 @@ class Player {
 
     // Separate Hitboxes
     this.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
-    this.defenderHitbox = { x: this.x + 50, y: this.y + 50, width: 100, height: 100 };
+     this.defenderHitbox = { x: 0, y: 0, width: 0, height: 0 };
   }
 
   updateDefenderHitbox() {
+    console.log(`Character: ${this.character}, Facing: ${this.facing}`);
+    
+    const config = characterConfig[this.character]?.defenderHitbox?.[this.facing];
+    
+    if (!config) {
+      console.error(`Defender hitbox configuration not found for facing: ${this.facing}`);
+      return;
+    }
+  
     this.defenderHitbox = {
-      x: this.x + 50,
-      y: this.y + 50,
-      width: this.width - 100, // Beispiel: kleinere Breite
-      height: this.height - 100, // Beispiel: kleinere Höhe
-    };
-  }
-
+      x: this.x + config.offsetX,
+      y: this.y + config.offsetY,
+      width: config.width,
+      height: config.height,
+    };}
   setCharacter(character) {
     this.character = character;
     this.action = "idle";
@@ -474,24 +517,18 @@ function update() {
     player.canAttack = false;
     player.damageDealt = false;
   
-    // Set attack hitbox dimensions
-    if (attackType === "attack1") {
-      player.attackHitbox = {
-        x: player.facing === "right" ? player.x + player.width : player.x - 60,
-        y: player.y + 20,
-        width: 60,
-        height: 60,
-      };
-    } else if (attackType === "attack2") {
-      player.attackHitbox = {
-        x: player.facing === "right" ? player.x + player.width : player.x - 100,
-        y: player.y,
-        width: 100,
-        height: 100,
-      };
-    }
+    // Hole die Hitbox-Daten basierend auf der Blickrichtung
+    const hitboxConfig = attackConfig.hitbox[player.facing];
   
-    const damage = attackType === "attack1" ? 10 : 20; // Unterschiedlicher Schaden
+    player.attackHitbox = {
+      x: player.x + hitboxConfig.offsetX,
+      y: player.y + hitboxConfig.offsetY,
+      width: hitboxConfig.width,
+      height: hitboxConfig.height,
+    };
+  
+    // Unterschiedlicher Schaden je nach Angriff
+    const damage = attackType === "attack1" ? 10 : 20;
   
     const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
     const interval = setInterval(() => {
@@ -502,7 +539,7 @@ function update() {
       clearInterval(interval);
       player.action = "idle";
       player.canAttack = true;
-      player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
+      player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Zurücksetzen
     }, animationDuration);
   }
 function resolveVerticalOverlap(player1, player2) {
@@ -675,10 +712,10 @@ function gameLoop(currentTime) {
     drawPlayer(player2);
     debugPlayer(player1);
     debugPlayer(player2);
-    drawHitbox(player1.defenderHitbox, "blue"); // Player 1 Defender Hitbox
-    drawHitbox(player2.defenderHitbox, "blue"); // Player 2 Defender Hitbox
-    drawHitbox(player1.attackHitbox, "red");    // Player 1 Attack Hitbox
-    drawHitbox(player2.attackHitbox, "red");    // Player 2 Attack Hitbox
+    drawHitbox(player1.defenderHitbox, "blue"); // Defender-Hitbox in Blau
+    drawHitbox(player2.defenderHitbox, "blue");
+    drawHitbox(player1.attackHitbox, "red");    // Attack-Hitbox in Rot
+    drawHitbox(player2.attackHitbox, "red");
 
     // 9. Gesundheitsbalken und Statusanzeigen aktualisieren
     updateHealth();
