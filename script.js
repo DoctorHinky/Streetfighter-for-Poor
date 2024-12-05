@@ -429,8 +429,51 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", (e) => {
   keys[e.key] = false;
 });
-
 function update() {
+  const applyGravity = (player) => {
+    // Gravitation anwenden, wenn der Spieler in der Luft ist
+    if (!player.isJumping && player.y < 150) {
+      player.velocityY += player.gravity; // Gravitation hinzufügen
+      player.y += player.velocityY; // Position anpassen
+
+      if (player.y >= 150) {
+        // Spieler erreicht den Boden
+        player.y = 150; // Zurück auf Ursprungslevel
+        player.velocityY = 0; // Vertikale Geschwindigkeit zurücksetzen
+        player.action = "idle"; // Zurück zur Idle-Animation
+      }
+    }
+  };
+
+  const handleJump = (player, jumpKey) => {
+    if (keys[jumpKey] && !player.isJumping && player.y >= 150) {
+      // Sprung starten
+      player.velocityY = player.jumpStrength; // Sprungkraft anwenden
+      player.isJumping = true;
+      player.action = "jump"; // Sprung-Animation starten
+    }
+
+    if (player.isJumping) {
+      player.y += player.velocityY; // Vertikale Position anpassen
+      player.velocityY += player.gravity; // Gravitation anwenden
+
+      if (player.y >= 150) {
+        // Landen
+        player.y = 150; // Zurück auf Ursprungslevel
+        player.velocityY = 0; // Vertikale Geschwindigkeit zurücksetzen
+        player.isJumping = false; // Sprung beenden
+        player.action = "idle"; // Zurück zur Idle-Animation
+      }
+    }
+  };
+
+  // Gravitation und Sprünge für Spieler anwenden
+  applyGravity(player1);
+  handleJump(player1, "w");
+
+  applyGravity(player2);
+  handleJump(player2, "ArrowUp");
+
   // Spieler 1 Blockhaltung aktivieren
   if (keys["s"] && !player1.isBlocking && !player1.isStunned) {
     player1.isBlocking = true;
@@ -454,33 +497,15 @@ function update() {
     if (keys["a"]) {
       player1.x -= player1.speed; // Nach links bewegen
       player1.facing = "left";
-      player1.action = "walk";
+      if (!player1.isJumping) player1.action = "walk"; // Animation nur setzen, wenn nicht gesprungen wird
     }
     if (keys["d"]) {
       player1.x += player1.speed; // Nach rechts bewegen
       player1.facing = "right";
-      player1.action = "walk";
+      if (!player1.isJumping) player1.action = "walk";
     }
     if (!keys["a"] && !keys["d"] && !player1.isJumping) {
       player1.action = "idle"; // Keine Bewegung
-    }
-
-    // Sprunglogik für Spieler 1
-    if (keys["w"] && !player1.isJumping) {
-      player1.velocityY = player1.jumpStrength;
-      player1.isJumping = true;
-      player1.action = "jump";
-      player1.currentFrame = 0;
-    }
-    if (player1.isJumping) {
-      player1.y += player1.velocityY;
-      player1.velocityY += player1.gravity;
-
-      if (player1.y >= 150) { // Landen
-        player1.y = 150;
-        player1.isJumping = false;
-        player1.action = "idle";
-      }
     }
 
     // Angriff ausführen
@@ -493,33 +518,15 @@ function update() {
     if (keys["ArrowLeft"]) {
       player2.x -= player2.speed;
       player2.facing = "left";
-      player2.action = "walk";
+      if (!player2.isJumping) player2.action = "walk";
     }
     if (keys["ArrowRight"]) {
       player2.x += player2.speed;
       player2.facing = "right";
-      player2.action = "walk";
+      if (!player2.isJumping) player2.action = "walk";
     }
     if (!keys["ArrowLeft"] && !keys["ArrowRight"] && !player2.isJumping) {
       player2.action = "idle";
-    }
-
-    // Sprunglogik für Spieler 2
-    if (keys["ArrowUp"] && !player2.isJumping) {
-      player2.velocityY = player2.jumpStrength;
-      player2.isJumping = true;
-      player2.action = "jump";
-      player2.currentFrame = 0;
-    }
-    if (player2.isJumping) {
-      player2.y += player2.velocityY;
-      player2.velocityY += player2.gravity;
-
-      if (player2.y >= 150) { // Landen
-        player2.y = 150;
-        player2.isJumping = false;
-        player2.action = "idle";
-      }
     }
 
     // Angriff ausführen
@@ -556,6 +563,7 @@ function update() {
   player1.updateDefenderHitbox();
   player2.updateDefenderHitbox();
 }
+
 
 
 
