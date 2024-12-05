@@ -19,6 +19,13 @@ function drawBackground() {
 // Zentrale Konfiguration für Charaktere und Animationen
 const characterConfig = {
   bancho: {
+    stun:{
+      frames: 6, // Anzahl der Frames für die Stun-Animation
+      src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_stun.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 50, // Geschwindigkeit der Stun-Animation
+    },
     idle: {
       frames: 7,
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_Idle.png",
@@ -269,10 +276,22 @@ class Player {
     this.lastFrameUpdateTime = 0;
     this.facing = "right";
 
+    // Block-Mechanik
+    this.blockDamageTaken = 0; // Angesammelter geblockter Schaden
+    this.isStunned = false; // Status, ob der Spieler gestunned ist
+    this.blockResetTimeout = null; // Timer für das Zurücksetzen des Block-Schadens
+
     // Separate Hitboxes
     this.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
-     this.defenderHitbox = { x: 0, y: 0, width: 0, height: 0 };
+    this.defenderHitbox = { x: 0, y: 0, width: 0, height: 0 };
   }
+
+  resetBlockDamage() {
+    this.blockDamageTaken = 0;
+    console.log(`${this.character}: Block-Schaden zurückgesetzt.`);
+  }
+
+
 
   updateDefenderHitbox() {
     
@@ -354,26 +373,35 @@ function updateAnimationFrames(currentTime) {
     if (currentTime - player.lastFrameUpdateTime >= speed) {
       player.lastFrameUpdateTime = currentTime;
 
-      // Block-Logik: Bei "block" am letzten Frame stoppen
+      // Spezielle Block-Logik
       if (player.action === "block") {
         if (player.currentFrame < config.frames - 1) {
-          player.currentFrame++;
+          player.currentFrame++; // Nächsten Frame anzeigen
         }
-        return; // Weitere Logik überspringen, da Block-Animation nicht zurückgesetzt wird
+        // Am letzten Frame bleiben, solange geblockt wird
+        return; // Keine weitere Logik ausführen
       }
 
-      // Normale Animationslogik
+      // Stun-Animation loopen
+      if (player.action === "stun") {
+        player.currentFrame++;
+        if (player.currentFrame >= config.frames) {
+          player.currentFrame = 0; // Zurück zum ersten Frame, um die Animation zu loopen
+        }
+        return; // Keine weitere Logik ausführen
+      }
+
+      // Normale Animationslogik für andere Aktionen
       player.currentFrame++;
 
       console.log(
         `Player: ${player.character}, Action: ${player.action}, Current Frame: ${player.currentFrame}`
       );
 
-      // Wenn die Animation beendet ist
+      // Animation zurücksetzen, wenn sie beendet ist
       if (player.currentFrame >= config.frames) {
         if (player.action.startsWith("attack")) {
-          console.log(`Attack animation complete for ${player.character}. Resetting to idle.`);
-          player.action = "idle"; // Zurück zu Idle nach Attacke
+          player.action = "idle"; // Zurück zur Idle-Animation nach Attacke
         }
         player.currentFrame = 0; // Zurück zum ersten Frame
       }
@@ -390,6 +418,10 @@ function updateAnimationFrames(currentTime) {
 
 
 
+
+
+
+
 const keys = {};
 window.addEventListener("keydown", (e) => {
   keys[e.key] = true;
@@ -400,25 +432,25 @@ window.addEventListener("keyup", (e) => {
 
 function update() {
   // Spieler 1 Blockhaltung aktivieren
-  if (keys["s"] && !player1.isBlocking) {
+  if (keys["s"] && !player1.isBlocking && !player1.isStunned) {
     player1.isBlocking = true;
-    player1.action = "block"; // Starte die Blockanimation
-    player1.currentFrame = 0; // Animation beginnt bei Frame 0
-  } else if (!keys["s"]) {
-    player1.isBlocking = false; // Blockhaltung beenden
+    player1.action = "block";
+    player1.currentFrame = 0; // Animation von Anfang starten
+  } else if (!keys["s"] || player1.isStunned) {
+    player1.isBlocking = false;
   }
 
   // Spieler 2 Blockhaltung aktivieren
-  if (keys["ArrowDown"] && !player2.isBlocking) {
+  if (keys["ArrowDown"] && !player2.isBlocking && !player2.isStunned) {
     player2.isBlocking = true;
-    player2.action = "block"; // Starte die Blockanimation
-    player2.currentFrame = 0; // Animation beginnt bei Frame 0
-  } else if (!keys["ArrowDown"]) {
-    player2.isBlocking = false; // Blockhaltung beenden
+    player2.action = "block";
+    player2.currentFrame = 0; // Animation von Anfang starten
+  } else if (!keys["ArrowDown"] || player2.isStunned) {
+    player2.isBlocking = false;
   }
 
   // Spieler 1 Bewegungen und Aktionen
-  if (!player1.isBlocking && !player1.isHurt && !player1.action.startsWith("attack")) {
+  if (!player1.isBlocking && !player1.isHurt && !player1.isStunned && !player1.action.startsWith("attack")) {
     if (keys["a"]) {
       player1.x -= player1.speed; // Nach links bewegen
       player1.facing = "left";
@@ -457,7 +489,7 @@ function update() {
   }
 
   // Spieler 2 Bewegungen und Aktionen
-  if (!player2.isBlocking && !player2.isHurt && !player2.action.startsWith("attack")) {
+  if (!player2.isBlocking && !player2.isHurt && !player2.isStunned && !player2.action.startsWith("attack")) {
     if (keys["ArrowLeft"]) {
       player2.x -= player2.speed;
       player2.facing = "left";
@@ -524,6 +556,7 @@ function update() {
   player1.updateDefenderHitbox();
   player2.updateDefenderHitbox();
 }
+
 
 
 
@@ -622,30 +655,42 @@ function checkAttackConnect(attacker, defender, damage) {
 
   if (overlap && !attacker.damageDealt) {
     attacker.damageDealt = true; // Schaden nur einmal pro Angriff
+
     if (defender.isBlocking) {
-      console.log(`${defender.character} blockt den Angriff von ${attacker.character}!`);
+      defender.blockDamageTaken += damage;
+      console.log(`${defender.character} blockt ${damage} Schaden!`);
+
+      // Block-Brechen prüfen
+      if (defender.blockDamageTaken >= 60) {
+        console.log(`${defender.character}: Block gebrochen!`);
+        defender.isBlocking = false; // Blocken beenden
+        defender.isStunned = true;  // Spieler wird gestunned
+        defender.action = "stun";  // Stun-Animation starten
+        defender.currentFrame = 0; // Animation von Anfang starten
+
+        // Stun-Dauer festlegen
+        setTimeout(() => {
+          defender.isStunned = false; // Stun beenden
+          defender.action = "idle";  // Zurück zur Idle-Animation
+          defender.resetBlockDamage(); // Block-Schaden zurücksetzen
+        }, 2000); // 2 Sekunden Stun-Dauer
+      }
+
+      // Block-Schaden-Zurücksetzen nach Timeout
+      clearTimeout(defender.blockResetTimeout);
+      defender.blockResetTimeout = setTimeout(() => {
+        defender.resetBlockDamage();
+      }, 5000); // Nach 5 Sekunden ohne Blocken
     } else {
+      // Schaden zufügen, wenn nicht geblockt wird
       defender.health -= damage;
       console.log(`${attacker.character} trifft ${defender.character} für ${damage} Schaden!`);
       triggerHurtAnimation(defender);
     }
   }
 }
-function triggerHurtAnimation(player) {
-  const hurtConfig = characterConfig[player.character].hurt;
 
-  player.isHurt = true;
-  player.action = "hurt";
-  player.currentFrame = 0;
 
-  const animationDuration = hurtConfig.frames * (hurtConfig.speed || 100);
-
-  setTimeout(() => {
-    player.isHurt = false; // Aktionen wieder erlauben
-    player.action = "idle"; // Zurück zur Idle-Animation
-    player.currentFrame = 0;
-  }, animationDuration);
-}
 
 function triggerAttack(player, attackType) {
   const attackConfig = characterConfig[player.character][attackType];
