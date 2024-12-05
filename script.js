@@ -73,6 +73,13 @@ const characterConfig = {
       right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
       left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
     },
+    block: {
+      frames: 3, // Anzahl der Frames in der Block-Animation
+      src: "./assets/sprites/Bancho/Sprite_Sheet/bancho_Block.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 100, // Geschwindigkeit der Animation
+    },
   },
   battingGirl: {
     idle: {
@@ -128,6 +135,13 @@ const characterConfig = {
     defenderHitbox: {
       right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
       left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
+    },
+    block: {
+      frames: 3,
+      src: "./assets/sprites/BattingGirl/Sprite_Sheet/battingGirl_Block.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 100,
     },
   },
   bruteArms: {
@@ -185,6 +199,13 @@ const characterConfig = {
       right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
       left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
     },
+    block: {
+      frames: 3,
+      src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Block.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 100,
+    },
   },
 };
 
@@ -241,6 +262,7 @@ class Player {
     this.isJumping = false;
     this.health = 300;
     this.canAttack = true;
+    this.isHurt = false;
     this.currentFrame = 0;
     this.jumpStrength = -6;
     this.gravity = 0.1;
@@ -253,7 +275,6 @@ class Player {
   }
 
   updateDefenderHitbox() {
-    console.log(`Character: ${this.character}, Facing: ${this.facing}`);
     
     const config = characterConfig[this.character]?.defenderHitbox?.[this.facing];
     
@@ -319,28 +340,56 @@ function drawPlayer(player) {
 }
 
 // Animation aktualisieren
+// Funktion zur Aktualisierung der Animationsframes
 function updateAnimationFrames(currentTime) {
-  const animationSpeed = 100; // Allgemeine Animationsgeschwindigkeit (falls global verwendet)
-  if (currentTime - lastSpriteUpdateTime >= animationSpeed) {
-    lastSpriteUpdateTime = currentTime;
-
-    // Player 1
-    const player1Config = characterConfig[player1.character][player1.action || "idle"];
-    const player1Speed = player1Config.speed; // Ohne Fallback
-    if (currentTime - player1.lastFrameUpdateTime >= player1Speed) {
-      player1.currentFrame = (player1.currentFrame + 1) % player1Config.frames;
-      player1.lastFrameUpdateTime = currentTime;
+  const updateFrame = (player) => {
+    const config = characterConfig[player.character][player.action || "idle"];
+    if (!config) {
+      console.error(`No config found for action: ${player.action} (Character: ${player.character})`);
+      return;
     }
 
-    // Player 2
-    const player2Config = characterConfig[player2.character][player2.action || "idle"];
-    const player2Speed = player2Config.speed; // Ohne Fallback
-    if (currentTime - player2.lastFrameUpdateTime >= player2Speed) {
-      player2.currentFrame = (player2.currentFrame + 1) % player2Config.frames;
-      player2.lastFrameUpdateTime = currentTime;
+    const speed = config.speed || 100;
+
+    if (currentTime - player.lastFrameUpdateTime >= speed) {
+      player.lastFrameUpdateTime = currentTime;
+
+      // Block-Logik: Bei "block" am letzten Frame stoppen
+      if (player.action === "block") {
+        if (player.currentFrame < config.frames - 1) {
+          player.currentFrame++;
+        }
+        return; // Weitere Logik überspringen, da Block-Animation nicht zurückgesetzt wird
+      }
+
+      // Normale Animationslogik
+      player.currentFrame++;
+
+      console.log(
+        `Player: ${player.character}, Action: ${player.action}, Current Frame: ${player.currentFrame}`
+      );
+
+      // Wenn die Animation beendet ist
+      if (player.currentFrame >= config.frames) {
+        if (player.action.startsWith("attack")) {
+          console.log(`Attack animation complete for ${player.character}. Resetting to idle.`);
+          player.action = "idle"; // Zurück zu Idle nach Attacke
+        }
+        player.currentFrame = 0; // Zurück zum ersten Frame
+      }
     }
-  }
+  };
+
+  // Spieler 1 und 2 Frames aktualisieren
+  updateFrame(player1);
+  updateFrame(player2);
 }
+
+
+
+
+
+
 const keys = {};
 window.addEventListener("keydown", (e) => {
   keys[e.key] = true;
@@ -350,7 +399,103 @@ window.addEventListener("keyup", (e) => {
 });
 
 function update() {
-  // Bewegung von Spieler 1
+  // Spieler 1 Blockhaltung aktivieren
+  if (keys["s"] && !player1.isBlocking) {
+    player1.isBlocking = true;
+    player1.action = "block"; // Starte die Blockanimation
+    player1.currentFrame = 0; // Animation beginnt bei Frame 0
+  } else if (!keys["s"]) {
+    player1.isBlocking = false; // Blockhaltung beenden
+  }
+
+  // Spieler 2 Blockhaltung aktivieren
+  if (keys["ArrowDown"] && !player2.isBlocking) {
+    player2.isBlocking = true;
+    player2.action = "block"; // Starte die Blockanimation
+    player2.currentFrame = 0; // Animation beginnt bei Frame 0
+  } else if (!keys["ArrowDown"]) {
+    player2.isBlocking = false; // Blockhaltung beenden
+  }
+
+  // Spieler 1 Bewegungen und Aktionen
+  if (!player1.isBlocking && !player1.isHurt && !player1.action.startsWith("attack")) {
+    if (keys["a"]) {
+      player1.x -= player1.speed; // Nach links bewegen
+      player1.facing = "left";
+      player1.action = "walk";
+    }
+    if (keys["d"]) {
+      player1.x += player1.speed; // Nach rechts bewegen
+      player1.facing = "right";
+      player1.action = "walk";
+    }
+    if (!keys["a"] && !keys["d"] && !player1.isJumping) {
+      player1.action = "idle"; // Keine Bewegung
+    }
+
+    // Sprunglogik für Spieler 1
+    if (keys["w"] && !player1.isJumping) {
+      player1.velocityY = player1.jumpStrength;
+      player1.isJumping = true;
+      player1.action = "jump";
+      player1.currentFrame = 0;
+    }
+    if (player1.isJumping) {
+      player1.y += player1.velocityY;
+      player1.velocityY += player1.gravity;
+
+      if (player1.y >= 150) { // Landen
+        player1.y = 150;
+        player1.isJumping = false;
+        player1.action = "idle";
+      }
+    }
+
+    // Angriff ausführen
+    if (keys["j"]) triggerAttack(player1, "attack1");
+    if (keys["k"]) triggerAttack(player1, "attack2");
+  }
+
+  // Spieler 2 Bewegungen und Aktionen
+  if (!player2.isBlocking && !player2.isHurt && !player2.action.startsWith("attack")) {
+    if (keys["ArrowLeft"]) {
+      player2.x -= player2.speed;
+      player2.facing = "left";
+      player2.action = "walk";
+    }
+    if (keys["ArrowRight"]) {
+      player2.x += player2.speed;
+      player2.facing = "right";
+      player2.action = "walk";
+    }
+    if (!keys["ArrowLeft"] && !keys["ArrowRight"] && !player2.isJumping) {
+      player2.action = "idle";
+    }
+
+    // Sprunglogik für Spieler 2
+    if (keys["ArrowUp"] && !player2.isJumping) {
+      player2.velocityY = player2.jumpStrength;
+      player2.isJumping = true;
+      player2.action = "jump";
+      player2.currentFrame = 0;
+    }
+    if (player2.isJumping) {
+      player2.y += player2.velocityY;
+      player2.velocityY += player2.gravity;
+
+      if (player2.y >= 150) { // Landen
+        player2.y = 150;
+        player2.isJumping = false;
+        player2.action = "idle";
+      }
+    }
+
+    // Angriff ausführen
+    if (keys["1"]) triggerAttack(player2, "attack1");
+    if (keys["2"]) triggerAttack(player2, "attack2");
+  }
+
+  // Spieler blicken sich an
   if (player1.x < player2.x) {
     player1.facing = "right";
     player2.facing = "left";
@@ -358,192 +503,82 @@ function update() {
     player1.facing = "left";
     player2.facing = "right";
   }
-  if (!player1.isJumping && player1.canAttack && keys["j"]) {
-    triggerAttack(player1, "attack1");
-  } else if (!player1.isJumping && player1.canAttack && keys["k"]) {
-    triggerAttack(player1, "attack2");
-  } else {
-    if (keys["a"]) {
-      player1.x -= player1.speed;
-      if (checkModelOverlap(player1, player2)) {
-        player1.x += player1.speed;
-      } else {
-        player1.action = "walk";
-      }
-    }
-    if (keys["d"]) {
-      player1.x += player1.speed;
-      if (checkModelOverlap(player1, player2)) {
-        player1.x -= player1.speed;
-      } else {
-        player1.action = "walk";
-      }
-    }
-    if (!keys["a"] && !keys["d"] && !player1.isJumping && player1.canAttack) {
-      player1.action = "idle";
+
+  // Überlappung der Modelle verhindern
+  if (checkModelOverlap(player1, player2)) {
+    const overlapMargin = 10;
+    if (player1.x < player2.x) {
+      player1.x -= overlapMargin; // Spieler 1 nach links verschieben
+      player2.x += overlapMargin; // Spieler 2 nach rechts verschieben
+    } else {
+      player1.x += overlapMargin; // Spieler 1 nach rechts verschieben
+      player2.x -= overlapMargin; // Spieler 2 nach links verschieben
     }
   }
 
-  // Sprunglogik für Spieler 1
-  if (keys["w"] && !player1.isJumping) {
-    const nextY = player1.y + player1.jumpStrength;
-    if (!checkModelOverlap({ ...player1, y: nextY }, player2)) {
-      player1.velocityY = player1.jumpStrength;
-      player1.isJumping = true;
-      player1.action = "jump";
-      player1.currentFrame = 0;
-    }
-  }
+  // Spieler auf dem Spielfeld begrenzen
+  player1.x = Math.max(0, Math.min(canvas.width - player1.width, player1.x));
+  player2.x = Math.max(0, Math.min(canvas.width - player2.width, player2.x));
 
-  if (player1.isJumping) {
-    const jumpConfig = characterConfig[player1.character].jump;
-    player1.y += player1.velocityY;
-    player1.velocityY += player1.gravity;
-
-    if (checkModelOverlap(player1, player2)) {
-      resolveVerticalOverlap(player1, player2);
-    }
-
-    if (player1.velocityY < 0) {
-      const midFrame = Math.floor(jumpConfig.frames / 2);
-      if (player1.currentFrame < midFrame) {
-        player1.currentFrame++;
-      }
-    } else if (player1.velocityY > 0) {
-      if (player1.currentFrame < jumpConfig.frames - 1) {
-        player1.currentFrame++;
-      }
-    }
-
-    if (player1.y >= 150) {
-      player1.y = 150;
-      player1.velocityY = 0;
-      player1.isJumping = false;
-      player1.action = "idle";
-      player1.currentFrame = 0;
-    }
-  }
-
-  // Bewegung und Sprunglogik für Spieler 2 (analog zu Spieler 1)
-  if (!player2.isJumping && player2.canAttack && keys["1"]) {
-    triggerAttack(player2, "attack1");
-  } else if (!player2.isJumping && player2.canAttack && keys["2"]) {
-    triggerAttack(player2, "attack2");
-  } else {
-    if (keys["ArrowLeft"]) {
-      player2.x -= player2.speed;
-      if (checkModelOverlap(player2, player1)) {
-        player2.x += player2.speed;
-      } else {
-        player2.action = "walk";
-      }
-    }
-    if (keys["ArrowRight"]) {
-      player2.x += player2.speed;
-      if (checkModelOverlap(player2, player1)) {
-        player2.x -= player2.speed;
-      } else {
-        player2.action = "walk";
-      }
-    }
-    if (
-      !keys["ArrowLeft"] &&
-      !keys["ArrowRight"] &&
-      !player2.isJumping &&
-      player2.canAttack
-    ) {
-      player2.action = "idle";
-    }
-  }
-
-  if (keys["ArrowUp"] && !player2.isJumping) {
-    const nextY = player2.y + player2.jumpStrength;
-    if (!checkModelOverlap({ ...player2, y: nextY }, player1)) {
-      player2.velocityY = player2.jumpStrength;
-      player2.isJumping = true;
-      player2.action = "jump";
-      player2.currentFrame = 0;
-    }
-  }
-
-  if (player2.isJumping) {
-    const jumpConfig = characterConfig[player2.character].jump;
-    player2.y += player2.velocityY;
-    player2.velocityY += player2.gravity;
-
-    if (checkModelOverlap(player2, player1)) {
-      resolveVerticalOverlap(player2, player1);
-    }
-
-    if (player2.velocityY < 0) {
-      const midFrame = Math.floor(jumpConfig.frames / 2);
-      if (player2.currentFrame < midFrame) {
-        player2.currentFrame++;
-      }
-    } else if (player2.velocityY > 0) {
-      if (player2.currentFrame < jumpConfig.frames - 1) {
-        player2.currentFrame++;
-      }
-    }
-
-    if (player2.y >= 150) {
-      player2.y = 150;
-      player2.velocityY = 0;
-      player2.isJumping = false;
-      player2.action = "idle";
-      player2.currentFrame = 0;
-    }
-  }
+  // Defender-Hitboxen aktualisieren
   player1.updateDefenderHitbox();
   player2.updateDefenderHitbox();
-  // Begrenzung der Spieler im Canvas
-  player1.x = Math.max(-40, Math.min(canvas.width +50 - player1.width, player1.x));
-  player2.x = Math.max(-40, Math.min(canvas.width +50 - player2.width, player2.x));
 }
 
-  // Angriff für Spieler 1
-  if (keys["j"] && player1.canAttack) {
-    triggerAttack(player1);
+
+
+
+function triggerAttack(player, attackType) {
+  const attackConfig = characterConfig[player.character][attackType];
+  if (!attackConfig || !player.canAttack) {
+    console.warn(`Cannot trigger attack: ${attackType} for ${player.character}. Reason: Invalid config or attack cooldown.`);
+    return;
   }
 
-  // Angriff für Spieler 2
-  if (keys["1"] && player2.canAttack) {
-    triggerAttack(player2);
-  }
-  function triggerAttack(player, attackType) {
-    const attackConfig = characterConfig[player.character][attackType];
-    player.action = attackType;
-    player.currentFrame = 0;
-    player.canAttack = false;
-    player.damageDealt = false;
-  
-    // Hole die Hitbox-Daten basierend auf der Blickrichtung
-    const hitboxConfig = attackConfig.hitbox[player.facing];
-  
-    player.attackHitbox = {
-      x: player.x + hitboxConfig.offsetX,
-      y: player.y + hitboxConfig.offsetY,
-      width: hitboxConfig.width,
-      height: hitboxConfig.height,
-    };
-  
-    // Unterschiedlicher Schaden je nach Angriff
-    const damage = attackType === "attack1" ? 10 : 20;
-  
-    const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
-    const interval = setInterval(() => {
-      checkAttackConnect(player, player === player1 ? player2 : player1, damage);
-    }, 50);
-  
-    setTimeout(() => {
-      clearInterval(interval);
-      player.action = "idle";
-      player.canAttack = true;
-      player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Zurücksetzen
-    }, animationDuration);
-  }
+  console.log(`Triggering attack: ${attackType} for ${player.character}`);
+
+  player.action = attackType; // Angriff starten
+  player.currentFrame = 0; // Animation von Anfang starten
+  player.canAttack = false; // Während des Angriffs keine neuen Aktionen erlauben
+
+  // Hitbox-Daten setzen
+  const hitboxConfig = attackConfig.hitbox[player.facing];
+  player.attackHitbox = {
+    x: player.x + hitboxConfig.offsetX,
+    y: player.y + hitboxConfig.offsetY,
+    width: hitboxConfig.width,
+    height: hitboxConfig.height,
+  };
+
+  console.log(`Attack hitbox for ${player.character}:`, player.attackHitbox);
+
+  // Schadensprüfung nach Verzögerung auslösen
+  const damageDelay = Math.floor(attackConfig.frames / 2) * attackConfig.speed;
+  setTimeout(() => {
+    if (!player.damageDealt) {
+      console.log(`Checking damage for ${player.character} during attack: ${attackType}`);
+      checkAttackConnect(player, player === player1 ? player2 : player1, attackType === "attack1" ? 10 : 20);
+    }
+  }, damageDelay);
+
+  // Animation vollständig ablaufen lassen
+  const animationDuration = attackConfig.frames * attackConfig.speed;
+  setTimeout(() => {
+    console.log(`Attack animation finished for ${player.character}`);
+    player.action = "idle"; // Zurück zur Idle-Animation
+    player.canAttack = true; // Spieler kann wieder angreifen
+    player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Hitbox zurücksetzen
+    player.damageDealt = false; // Schaden-Status zurücksetzen
+  }, animationDuration);
+}
+
+
+
+
+
+
 function resolveVerticalOverlap(player1, player2) {
-  const overlapMargin = 10; // Sicherheitsabstand
+  const overlapMargin = 150; // Sicherheitsabstand
 
   // Spieler sind vertikal überlappend
   if (
@@ -575,7 +610,6 @@ function checkModelOverlap(player1, player2) {
   // Overlap occurs only if both horizontal and vertical overlaps are true
   return overlapHorizontal && overlapVertical;
 }
-
 function checkAttackConnect(attacker, defender, damage) {
   const hitbox = attacker.attackHitbox;
   const defenderBox = defender.defenderHitbox;
@@ -587,11 +621,67 @@ function checkAttackConnect(attacker, defender, damage) {
     hitbox.y + hitbox.height > defenderBox.y;
 
   if (overlap && !attacker.damageDealt) {
-    defender.health -= damage;
-    attacker.damageDealt = true;
-    console.log(`${attacker.character} trifft ${defender.character} für ${damage} Schaden!`);
+    attacker.damageDealt = true; // Schaden nur einmal pro Angriff
+    if (defender.isBlocking) {
+      console.log(`${defender.character} blockt den Angriff von ${attacker.character}!`);
+    } else {
+      defender.health -= damage;
+      console.log(`${attacker.character} trifft ${defender.character} für ${damage} Schaden!`);
+      triggerHurtAnimation(defender);
+    }
   }
 }
+function triggerHurtAnimation(player) {
+  const hurtConfig = characterConfig[player.character].hurt;
+
+  player.isHurt = true;
+  player.action = "hurt";
+  player.currentFrame = 0;
+
+  const animationDuration = hurtConfig.frames * (hurtConfig.speed || 100);
+
+  setTimeout(() => {
+    player.isHurt = false; // Aktionen wieder erlauben
+    player.action = "idle"; // Zurück zur Idle-Animation
+    player.currentFrame = 0;
+  }, animationDuration);
+}
+
+function triggerAttack(player, attackType) {
+  const attackConfig = characterConfig[player.character][attackType];
+  player.action = attackType; // Starte die Angriffanimation
+  player.currentFrame = 0; // Animation von Anfang starten
+  player.canAttack = false; // Spieler kann nicht erneut angreifen
+  player.damageDealt = false; // Schaden noch nicht verursacht
+
+  // Hitbox-Daten basierend auf Blickrichtung setzen
+  const hitboxConfig = attackConfig.hitbox[player.facing];
+  player.attackHitbox = {
+    x: player.x + hitboxConfig.offsetX,
+    y: player.y + hitboxConfig.offsetY,
+    width: hitboxConfig.width,
+    height: hitboxConfig.height,
+  };
+
+  // Schadensprüfung verzögert starten
+  const damageDelay = 300; // Verzögerung in ms
+  const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
+
+  setTimeout(() => {
+    if (!player.damageDealt) {
+      checkAttackConnect(player, player === player1 ? player2 : player1, attackType === "attack1" ? 10 : 20);
+    }
+  }, damageDelay);
+
+  // Angriff zurücksetzen nach Animationsdauer
+  setTimeout(() => {
+    player.action = "idle"; // Zurück zur Idle-Animation
+    player.canAttack = true; // Spieler kann wieder angreifen
+    player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Hitbox zurücksetzen
+    player.damageDealt = false; // Schaden-Status zurücksetzen
+  }, animationDuration);
+}
+
 function drawHitbox(hitbox, color = "blue") {
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
@@ -684,6 +774,7 @@ function debugPlayer(player) {
   ctx.font = "12px Arial";
   ctx.fillText(`Action: ${player.action}`, player.x, player.y - 10);
   ctx.fillText(`Frame: ${player.currentFrame}`, player.x, player.y - 25);
+  ctx.fillText(`isBlocking: ${player.isBlocking}`, player.x, player.y - 40);
 }
 
 

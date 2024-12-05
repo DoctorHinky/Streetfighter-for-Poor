@@ -12,3 +12,5 @@ Einfaches Streetfighter game
 - Unterschiedliche timer 
 ? Menu erstellen
 - pause sceen
+- hitboxen anpassen an attacks und charaktere
+-blocken in der luft und angriff in der luft
