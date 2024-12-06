@@ -816,21 +816,21 @@ function updateHealth() {
   const player1HealthBar = document.getElementById("player1-health");
   const player2HealthBar = document.getElementById("player2-health");
 
-  player1HealthBar.style.width = `${(player1.health / 300) * 100}%`;
-  player2HealthBar.style.width = `${(player2.health / 300) * 100}%`;
+  player1HealthBar.style.transform = `scaleX(${player1.health / 300})`;
+  player2HealthBar.style.transform = `scaleX(${player2.health / 300})`;
 
   // Farben anpassen
   player1HealthBar.style.background = player1.health > 60
-    ? "green"
+    ? "linear-gradient(90deg, rgba(80,80,80,1) 0%, rgba(50,157,0,1) 56%)"
     : player1.health > 30
-    ? "orange"
-    : "red";
+    ? "linear-gradient(90deg, rgba(80,80,80,1) 0%, rgba(255,149,0,1) 56%)"
+    : "linear-gradient(90deg, rgba(80,80,80,1) 0%, rgba(167,0,0,1) 64%)";
 
   player2HealthBar.style.background = player2.health > 60
-    ? "green"
+    ? "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(50,157,0,1) 56%)"
     : player2.health > 30
-    ? "orange"
-    : "red";
+    ? "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(255,149,0,1) 56%)"
+    : "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(167,0,0,1) 64%)";
 }
 // Aktion zurücksetzen
 function resetAction(player, delay) {
