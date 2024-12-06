@@ -13,4 +13,3 @@ Einfaches Streetfighter game
 ? Menu erstellen
 - pause sceen
 - hitboxen anpassen an attacks und charaktere
--blocken in der luft und angriff in der luft
