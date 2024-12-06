@@ -357,7 +357,26 @@ function drawPlayer(player) {
 
   ctx.restore(); // Zustand wiederherstellen
 }
+function triggerHurtAnimation(player) {
+  const hurtConfig = characterConfig[player.character]?.hurt;
 
+  if (!hurtConfig) {
+    console.error(`Hurt animation config not found for character: ${player.character}`);
+    return;
+  }
+
+  player.action = "hurt"; // Setzt die Animation auf "Hurt"
+  player.currentFrame = 0; // Startet die Animation vom ersten Frame
+  player.isHurt = true; // Setzt den Spieler in den "Hurt"-Status
+
+  // Dauer der Animation berechnen
+  const hurtDuration = hurtConfig.frames * hurtConfig.speed;
+
+  setTimeout(() => {
+    player.isHurt = false; // Beendet den "Hurt"-Status
+    player.action = "idle"; // Wechselt zurück zur Idle-Animation
+  }, hurtDuration);
+}
 // Animation aktualisieren
 // Funktion zur Aktualisierung der Animationsframes
 function updateAnimationFrames(currentTime) {
@@ -394,9 +413,9 @@ function updateAnimationFrames(currentTime) {
       // Normale Animationslogik für andere Aktionen
       player.currentFrame++;
 
-      console.log(
-        `Player: ${player.character}, Action: ${player.action}, Current Frame: ${player.currentFrame}`
-      );
+      // console.log(
+      //   `Player: ${player.character}, Action: ${player.action}, Current Frame: ${player.currentFrame}`
+      // );
 
       // Animation zurücksetzen, wenn sie beendet ist
       if (player.currentFrame >= config.frames) {
@@ -700,40 +719,40 @@ function checkAttackConnect(attacker, defender, damage) {
 
 
 
-function triggerAttack(player, attackType) {
-  const attackConfig = characterConfig[player.character][attackType];
-  player.action = attackType; // Starte die Angriffanimation
-  player.currentFrame = 0; // Animation von Anfang starten
-  player.canAttack = false; // Spieler kann nicht erneut angreifen
-  player.damageDealt = false; // Schaden noch nicht verursacht
+// function triggerAttack(player, attackType) {
+//   const attackConfig = characterConfig[player.character][attackType];
+//   player.action = attackType; // Starte die Angriffanimation
+//   player.currentFrame = 0; // Animation von Anfang starten
+//   player.canAttack = false; // Spieler kann nicht erneut angreifen
+//   player.damageDealt = false; // Schaden noch nicht verursacht
 
-  // Hitbox-Daten basierend auf Blickrichtung setzen
-  const hitboxConfig = attackConfig.hitbox[player.facing];
-  player.attackHitbox = {
-    x: player.x + hitboxConfig.offsetX,
-    y: player.y + hitboxConfig.offsetY,
-    width: hitboxConfig.width,
-    height: hitboxConfig.height,
-  };
+//   // Hitbox-Daten basierend auf Blickrichtung setzen
+//   const hitboxConfig = attackConfig.hitbox[player.facing];
+//   player.attackHitbox = {
+//     x: player.x + hitboxConfig.offsetX,
+//     y: player.y + hitboxConfig.offsetY,
+//     width: hitboxConfig.width,
+//     height: hitboxConfig.height,
+//   };
 
-  // Schadensprüfung verzögert starten
-  const damageDelay = 300; // Verzögerung in ms
-  const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
+//   // Schadensprüfung verzögert starten
+//   const damageDelay = 300; // Verzögerung in ms
+//   const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
 
-  setTimeout(() => {
-    if (!player.damageDealt) {
-      checkAttackConnect(player, player === player1 ? player2 : player1, attackType === "attack1" ? 10 : 20);
-    }
-  }, damageDelay);
+//   setTimeout(() => {
+//     if (!player.damageDealt) {
+//       checkAttackConnect(player, player === player1 ? player2 : player1, attackType === "attack1" ? 10 : 20);
+//     }
+//   }, damageDelay);
 
-  // Angriff zurücksetzen nach Animationsdauer
-  setTimeout(() => {
-    player.action = "idle"; // Zurück zur Idle-Animation
-    player.canAttack = true; // Spieler kann wieder angreifen
-    player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Hitbox zurücksetzen
-    player.damageDealt = false; // Schaden-Status zurücksetzen
-  }, animationDuration);
-}
+//   // Angriff zurücksetzen nach Animationsdauer
+//   setTimeout(() => {
+//     player.action = "idle"; // Zurück zur Idle-Animation
+//     player.canAttack = true; // Spieler kann wieder angreifen
+//     player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Hitbox zurücksetzen
+//     player.damageDealt = false; // Schaden-Status zurücksetzen
+//   }, animationDuration);
+// }
 
 function drawHitbox(hitbox, color = "blue") {
   ctx.strokeStyle = color;
