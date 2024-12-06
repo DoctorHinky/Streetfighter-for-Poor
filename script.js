@@ -19,6 +19,14 @@ function drawBackground() {
 // Zentrale Konfiguration für Charaktere und Animationen
 const characterConfig = {
   bancho: {
+    sounds: {
+      attack1: "./assets/sounds/bancho_attack1.mp3",
+      attack2: "./assets/sounds/bancho_attack2.mp3",
+      jump: "./assets/sounds/bancho_jump.mp3",
+      hurt: "./assets/sounds/bancho_hurt.mp3",
+      block: "./assets/sounds/bancho_block.mp3",
+      stun: "./assets/sounds/bancho_stun.mp3",
+    },
     stun:{
       frames: 6, // Anzahl der Frames für die Stun-Animation
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_stun.png",
@@ -89,6 +97,14 @@ const characterConfig = {
     },
   },
   battingGirl: {
+    sounds: {
+      attack1: "./assets/sounds/bancho_attack1.mp3",
+      attack2: "./assets/sounds/bancho_attack2.mp3",
+      jump: "./assets/sounds/bancho_jump.mp3",
+      hurt: "./assets/sounds/bancho_hurt.mp3",
+      block: "./assets/sounds/bancho_block.mp3",
+      stun: "./assets/sounds/bancho_stun.mp3",
+    },
     idle: {
       frames: 12,
       src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Idle-Sheet.png",
@@ -152,6 +168,14 @@ const characterConfig = {
     },
   },
   bruteArms: {
+    sounds: {
+      attack1: "./assets/sounds/bancho_attack1.mp3",
+      attack2: "./assets/sounds/bancho_attack2.mp3",
+      jump: "./assets/sounds/bancho_jump.mp3",
+      hurt: "./assets/sounds/bancho_hurt.mp3",
+      block: "./assets/sounds/bancho_block.mp3",
+      stun: "./assets/sounds/bancho_stun.mp3",
+    },
     idle: {
       frames: 7,
       src: "./assets/sprites/BruteArms/Sprite_Sheet/BruteArm_Idle.png",
@@ -254,7 +278,21 @@ preloadSprites(characterConfig)
   .catch(() => {
     console.error("Some sprites failed to load. Check your configuration.");
   });
-
+  function preloadCharacterSounds(character) {
+    const sounds = {};
+    const soundConfig = characterConfig[character]?.sounds;
+  
+    if (!soundConfig) return null;
+  
+    Object.entries(soundConfig).forEach(([action, src]) => {
+      const audio = new Audio(src);
+      audio.volume = 0.5; // Standardlautstärke
+      sounds[action] = audio;
+    });
+  
+    return sounds;
+  }
+  
 // Spieler-Klasse
 class Player {
   constructor(x, character) {
@@ -365,6 +403,13 @@ function triggerHurtAnimation(player) {
     return;
   }
 
+  // Hurt-Sound abspielen
+  const sound = player.sounds?.hurt;
+  if (sound) {
+    sound.currentTime = 0; // Sound von Anfang starten
+    sound.play();
+  }
+
   player.action = "hurt"; // Setzt die Animation auf "Hurt"
   player.currentFrame = 0; // Startet die Animation vom ersten Frame
   player.isHurt = true; // Setzt den Spieler in den "Hurt"-Status
@@ -377,6 +422,7 @@ function triggerHurtAnimation(player) {
     player.action = "idle"; // Wechselt zurück zur Idle-Animation
   }, hurtDuration);
 }
+
 // Animation aktualisieren
 // Funktion zur Aktualisierung der Animationsframes
 function updateAnimationFrames(currentTime) {
@@ -464,18 +510,25 @@ function update() {
     }
   };
 
-  const handleJump = (player, jumpKey) => {
+  function handleJump(player, jumpKey) {
     if (keys[jumpKey] && !player.isJumping && player.y >= 150) {
+      // Sprung-Sound abspielen
+      const sound = player.sounds?.jump;
+      if (sound) {
+        sound.currentTime = 0; // Sound von Anfang starten
+        sound.play();
+      }
+  
       // Sprung starten
       player.velocityY = player.jumpStrength; // Sprungkraft anwenden
       player.isJumping = true;
       player.action = "jump"; // Sprung-Animation starten
     }
-
+  
     if (player.isJumping) {
       player.y += player.velocityY; // Vertikale Position anpassen
       player.velocityY += player.gravity; // Gravitation anwenden
-
+  
       if (player.y >= 150) {
         // Landen
         player.y = 150; // Zurück auf Ursprungslevel
@@ -484,7 +537,8 @@ function update() {
         player.action = "idle"; // Zurück zur Idle-Animation
       }
     }
-  };
+  }
+  
 
   // Gravitation und Sprünge für Spieler anwenden
   applyGravity(player1);
@@ -597,6 +651,13 @@ function triggerAttack(player, attackType) {
 
   console.log(`Triggering attack: ${attackType} for ${player.character}`);
 
+  // Sound abspielen
+  const sound = player.sounds?.[attackType];
+  if (sound) {
+    sound.currentTime = 0; // Sound von Anfang abspielen
+    sound.play();
+  }
+
   player.action = attackType; // Angriff starten
   player.currentFrame = 0; // Animation von Anfang starten
   player.canAttack = false; // Während des Angriffs keine neuen Aktionen erlauben
@@ -631,6 +692,7 @@ function triggerAttack(player, attackType) {
     player.damageDealt = false; // Schaden-Status zurücksetzen
   }, animationDuration);
 }
+
 
 
 
@@ -684,38 +746,45 @@ function checkAttackConnect(attacker, defender, damage) {
     attacker.damageDealt = true; // Schaden nur einmal pro Angriff
 
     if (defender.isBlocking) {
+      const blockSound = defender.sounds?.block;
+      if (blockSound) {
+        blockSound.currentTime = 0;
+        blockSound.play();
+      }
       defender.blockDamageTaken += damage;
-      console.log(`${defender.character} blockt ${damage} Schaden!`);
 
       // Block-Brechen prüfen
       if (defender.blockDamageTaken >= 60) {
-        console.log(`${defender.character}: Block gebrochen!`);
-        defender.isBlocking = false; // Blocken beenden
-        defender.isStunned = true;  // Spieler wird gestunned
-        defender.action = "stun";  // Stun-Animation starten
-        defender.currentFrame = 0; // Animation von Anfang starten
+        const stunSound = defender.sounds?.stun;
+        if (stunSound) {
+          stunSound.currentTime = 0;
+          stunSound.play();
+        }
+        defender.isBlocking = false;
+        defender.isStunned = true;
+        defender.action = "stun";
+        defender.currentFrame = 0;
 
         // Stun-Dauer festlegen
         setTimeout(() => {
-          defender.isStunned = false; // Stun beenden
-          defender.action = "idle";  // Zurück zur Idle-Animation
-          defender.resetBlockDamage(); // Block-Schaden zurücksetzen
-        }, 2000); // 2 Sekunden Stun-Dauer
+          defender.isStunned = false;
+          defender.action = "idle";
+          defender.resetBlockDamage();
+        }, 2000);
       }
-
-      // Block-Schaden-Zurücksetzen nach Timeout
-      clearTimeout(defender.blockResetTimeout);
-      defender.blockResetTimeout = setTimeout(() => {
-        defender.resetBlockDamage();
-      }, 5000); // Nach 5 Sekunden ohne Blocken
     } else {
       // Schaden zufügen, wenn nicht geblockt wird
+      const hurtSound = defender.sounds?.hurt;
+      if (hurtSound) {
+        hurtSound.currentTime = 0;
+        hurtSound.play();
+      }
       defender.health -= damage;
-      console.log(`${attacker.character} trifft ${defender.character} für ${damage} Schaden!`);
       triggerHurtAnimation(defender);
     }
   }
 }
+
 
 
 
