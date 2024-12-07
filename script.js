@@ -1,4 +1,6 @@
 // Initialisiere Canvas
+
+import { SelectedMap, SelectedP1, SelectedP2 } from "./menu/menu.js";
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 800;
