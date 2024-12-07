@@ -1,3 +1,4 @@
+console.log("menu.js loaded");
 const menu = document.querySelector('main');
 const h1 = document.querySelector('h1');
 
@@ -11,17 +12,19 @@ let SelectedMap = null;
 let confirmed = {};
 let playerOneConfirmed = false;
 let playerTwoConfirmed = false;
+if(menu){
 
 menu.innerHTML = /* html */ `
-    <div id="bancho" class="character collected"><p class="playerName"></p><p>Bancho</p></div>
-    <div id="batty" class="character collected"><p class="playerName"></p><p>Batty</p></div>
-    <div id="brutus" class="character collected"><p class="playerName"></p><p>Brutus</p></div>
-    <div id="character4" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
-    <div id="character5" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
-    <div id="character6" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
-    <div id="character7" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
-    <div id="character8" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
+<div id="bancho" class="character collected"><p class="playerName"></p><p>Bancho</p></div>
+<div id="batty" class="character collected"><p class="playerName"></p><p>Batty</p></div>
+<div id="brutus" class="character collected"><p class="playerName"></p><p>Brutus</p></div>
+<div id="character4" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
+<div id="character5" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
+<div id="character6" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
+<div id="character7" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
+<div id="character8" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 `;
+}
 
 class Character {
     constructor(name, url) {
@@ -55,6 +58,12 @@ document.addEventListener('DOMContentLoaded', initCharacterMenu);
 
 h1.textContent = 'Player 1: Select your Character';
 
+const character = {
+    bancho: bancho,
+    batty: batty,
+    brutus: brutus,
+}
+
 // Event Listener
 function initCharacterMenu() {
     menu.addEventListener('click', (e) => {
@@ -65,11 +74,13 @@ function initCharacterMenu() {
         // Player 1 Auswahl und Bestätigung
         if (!playerOneConfirmed) {
             if (SelectedP1 === null) {
-                SelectedP1 = target;
+                SelectedP1 = character[target.id];
                 target.classList.add('selected');
+                console.log(SelectedP1.name);
+                
                 h1.textContent = "Player 1: Confirm your Selection";
                 target.querySelector('.playerName').textContent = "Player 1";
-            } else if (SelectedP1 === target) {
+            } else if (SelectedP1 === character[target.id]) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Player 2: Select your Character";
@@ -82,18 +93,23 @@ function initCharacterMenu() {
                 SelectedP1 = target;
                 target.querySelector('.playerName').textContent = "Player 1";
             }
+
+            console.log(SelectedP1);
+            
         }
         // Player 2 Auswahl und Bestätigung
         else if (playerOneConfirmed && !playerTwoConfirmed && target !== SelectedP1) {
             if (SelectedP2 === null) {
-                SelectedP2 = target;
+                SelectedP2 = character[target.id];
                 target.classList.add('selected');
                 h1.textContent = "Player 2: Confirm your Selection";
                 target.querySelector('.playerName').textContent = "Player 2";
-            } else if (SelectedP2 === target) {
+            } else if (SelectedP2 === character[target.id]) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Selection Complete!";
+                console.log(SelectedP2.name);
+                
                 playerTwoConfirmed = true;
                 confirmed.P2 = target.id;
             } else {
@@ -137,16 +153,17 @@ function initMapMenu() {
         </div>
         `;
 
-        setBackground('map1', 'url(background/alley.png)');
-        setBackground('map2', 'url(background/backalley.png)');
-        setBackground('map3', 'url(background/mainStreet.jpg)');
-        setBackground('map4', 'url(background/postapocalypse2.png)');
-        setBackground('map5', 'url(background/postapocalypse3.png)');
-        setBackground('map6', 'url(background/postapocalypse4.png)');
-        setBackground('map7', 'url(background/Rusted_4.webp)');
-        setBackground('map8', 'url(background/slums.png)');
-        document.getElementById('P1Head').style.background = SelectedP1.style.background;
-        document.getElementById('P2Head').style.background = SelectedP2.style.background;
+        setBackground('map1', 'url(../assets/background/alley.png)');
+        setBackground('map2', 'url(../assets/background/backalley.png)');
+        setBackground('map3', 'url(../assets/background/mainStreet.jpg)');
+        setBackground('map4', 'url(../assets/background/postapocalypse2.png)');
+        setBackground('map5', 'url(../assets/background/postapocalypse3.png)');
+        setBackground('map6', 'url(../assets/background/postapocalypse4.png)');
+        setBackground('map7', 'url(../assets/background/Rusted_4.webp)');
+        setBackground('map8', 'url(../assets/background/slums.png)');
+        document.getElementById('P1Head').style.background = `${SelectedP1.url} center center/cover no-repeat`;
+        document.getElementById('P2Head').style.background = `${SelectedP2.url} center center/cover no-repeat`;
+        
         
         menu.addEventListener('click', (e) => {
             const target = e.target.closest('.map');
@@ -201,6 +218,13 @@ function gameCountdown() {
     h1.style.fontSize = '3rem';
     h1.style.color = '#ff0';
 
+    sessionStorage.setItem('SelectedP1', SelectedP1.name);
+    sessionStorage.setItem('SelectedP2', SelectedP2.name);
+    sessionStorage.setItem('SelectedMap', SelectedMap.url);
+
+    console.log(SelectedP1.name, SelectedP2.name, SelectedMap.url);
+    
+
             setTimeout(() => {
                 h1.textContent = 3;
             }, 1000);        
@@ -212,9 +236,10 @@ function gameCountdown() {
             }, 3000);
             setTimeout(() => {
                 h1.textContent = 'HIER MUSS NOCH TEXT REIN!';
+                // window.location.href = '../index.html';  // das ist die verlinkung zum spiel
             }, 4000);
-
-
-            console.log(SelectedP1, SelectedP2, SelectedMap);
-            
 }
+
+export {SelectedMap, SelectedP1, SelectedP2}
+
+// die map kann noch nicht aus der gezogen werden

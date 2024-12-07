@@ -1,0 +1,110 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    background: url(../assets/background/loading.png) center center/ cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+h1 {
+    font-size: 12rem;
+    text-shadow: 5px 10px 5px black;
+    color: rgb(255, 215, 182);
+
+    &::first-letter {
+        font-size: 17rem;
+    }
+}
+
+button {
+    height: 100;
+    width: 600px;
+    background: none;
+    border: none;
+    font-size: 5rem;
+    font-weight: bold;
+    color: rgb(174, 245, 174);
+    text-shadow: 0px 0px 15px black;
+    animation: hopping 1s steps(1) infinite;
+}
+
+@keyframes hopping {
+    50% {
+        text-shadow: 0px 0px 0px black;
+    }
+}
+
+#loading {
+    position: relative;
+    font-size: 2em;
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    border: 2px solid black;
+    width: 60%;
+    height: 50px;
+
+    &::before {
+        content: "loading .";
+        position: absolute;
+        top: 30%;
+        right: 95%;
+        width: 200px;
+        animation: loading 3s infinite;
+        animation-play-state: var(--animation-before, paused);
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0%;
+        height: 100%;
+        width: 0%;
+        animation: ladebalken 15s forwards;
+        animation-play-state: var(--animation-after, paused);
+    }
+}
+
+@keyframes loading {
+    33% {
+        content: "loading .";
+    }
+
+    66% {
+        content: "loading ..";
+    }
+
+    99% {
+        content: "loading ..."
+    }
+}
+
+
+@keyframes ladebalken {
+    0% {
+        width: 0%;
+        background-color: red;
+    }
+
+    33% {
+        width: 33%;
+        background-color: yellow;
+    }
+
+    66% {
+        width: 66%;
+        background-color: yellowgreen;
+    }
+
+    100% {
+        width: 100%;
+        background-color: green;
+    }
+}
