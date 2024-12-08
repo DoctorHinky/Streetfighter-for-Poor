@@ -10,15 +10,14 @@ let SelectedP1 = null;
 let SelectedP2 = null;
 let SelectedMap = null;
 let mapUrl = null;
-let confirmed = {};
 let playerOneConfirmed = false;
 let playerTwoConfirmed = false;
 if(menu){
 // das /* hmtl */ wird verwendet um Syntaxhighlighting zu aktivieren, kann aber nur verwendet werden wenn man das nötige Plugin installiert hat.
 menu.innerHTML = /* html */ ` 
 <div id="bancho" class="character collected"><p class="playerName"></p><p>Bancho</p></div>
-<div id="batty" class="character collected"><p class="playerName"></p><p>Batty</p></div>
-<div id="brutus" class="character collected"><p class="playerName"></p><p>Brutus</p></div>
+<div id="battingGirl" class="character collected"><p class="playerName"></p><p>battingGirl</p></div>
+<div id="bruteArms" class="character collected"><p class="playerName"></p><p>bruteArms</p></div>
 <div id="character4" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character5" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character6" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
@@ -26,7 +25,7 @@ menu.innerHTML = /* html */ `
 <div id="character8" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 `;
 }
-
+// das erstellen der CharakterClass um nicht für jede ein objekt zu machen
 class Character {
     constructor(name, url) {
         this.name = name;
@@ -35,19 +34,19 @@ class Character {
 }
 
 const bancho = new Character("bancho", "url(characterImg/Bancho_Idle1.png)");
-const batty = new Character("batty", "url(characterImg/BattingGirl_Idle1.png)");
-const brutus = new Character("brutus", "url(characterImg/BruteArm_Idle1.png)");
+const battingGirl = new Character("battingGirl", "url(characterImg/BattingGirl_Idle1.png)");
+const bruteArms = new Character("bruteArms", "url(characterImg/BruteArm_Idle1.png)");
 const placeHolder = new Character("placeholder", "url(characterImg/placesHolder.png)");
 
 
-// das ist eine Hilfsfunktion um den Hintergrund der Charaktere zu setzen
+// das ist eine Hilfsfunktion um den Hintergrund der Objekte zu setzen zu setzen
 function setBackground(id, url) {
     document.getElementById(id).style.background = `${url} center center/cover no-repeat`;
 }
 
 setBackground('bancho', bancho.url);
-setBackground('batty', batty.url);
-setBackground('brutus', brutus.url);
+setBackground('battingGirl', battingGirl.url);
+setBackground('bruteArms', bruteArms.url);
 setBackground('character4', placeHolder.url);
 setBackground('character5', placeHolder.url);
 setBackground('character6', placeHolder.url);
@@ -63,8 +62,8 @@ h1.textContent = 'Player 1: Select your Character';
 
 const character = {
     bancho: bancho,
-    batty: batty,
-    brutus: brutus,
+    battingGirl: battingGirl,
+    bruteArms: bruteArms,
 }
 
 // Event Listener
@@ -77,10 +76,8 @@ function initCharacterMenu() {
         // Player 1 Auswahl und Bestätigung
         if (!playerOneConfirmed) {
             if (SelectedP1 === null) {
-                SelectedP1 = target;
-                target.classList.add('selected');
-                // console.log(SelectedP1.name); // debuggin um zu überpfüfen welcher character gespeichert wird. hier wird nur der name geloggt.
-                
+                SelectedP1 = target; // es wird das ganze hmtl objekt gespiechert aus welchem nachher das nur die Id extrahiert wird.
+                target.classList.add('selected');                
                 h1.textContent = "Player 1: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 1";
             } else if (SelectedP1 === target) {
@@ -88,7 +85,6 @@ function initCharacterMenu() {
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Player 2, your turn!";
                 playerOneConfirmed = true;
-                confirmed.P1 = target.id;
             } else {
                 SelectedP1.classList.remove('selected');
                 SelectedP1.querySelector('.playerName').textContent = "";
@@ -109,11 +105,8 @@ function initCharacterMenu() {
             } else if (SelectedP2 === target) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
-                h1.textContent = "Selection Complete!";
-                console.log(SelectedP2.name);
-                
+                h1.textContent = "Selection Complete!";                
                 playerTwoConfirmed = true;
-                confirmed.P2 = target.id;
             } else {
                 SelectedP2.classList.remove('selected');
                 SelectedP2.querySelector('.playerName').textContent = "";
@@ -122,7 +115,7 @@ function initCharacterMenu() {
                 target.querySelector('.playerName').textContent = "Player 2";
             }
         }
-        h1.textContent = playerOneConfirmed && playerTwoConfirmed ? 'Map Loading .' : h1.textContent;
+        h1.textContent = playerOneConfirmed && playerTwoConfirmed ? 'Map Loading ...' : h1.textContent;
         setTimeout(() => {
             initMapMenu();
         }, 2000);
@@ -193,6 +186,7 @@ function initMapMenu() {
     
         menu.addEventListener('click', (e) => {
             const target = e.target.closest('.playerHead');
+            h1.textContent = "Both Players, please click on your Character to confirm";
 
             if (!target) return;
             
@@ -212,6 +206,8 @@ function initMapMenu() {
                     gameCountdown();
                 }, 2000);
             }
+
+            menu.removeEventListener('click', initMapMenu);
         });
     }
 }
@@ -225,8 +221,8 @@ function gameCountdown() {
     h1.style.fontSize = '3rem';
     h1.style.color = '#ff0';
 
-    sessionStorage.setItem('SelectedP1', SelectedP1.name);
-    sessionStorage.setItem('SelectedP2', SelectedP2.name);
+    sessionStorage.setItem('SelectedP1', SelectedP1.id);
+    sessionStorage.setItem('SelectedP2', SelectedP2.id);
     sessionStorage.setItem('SelectedMap', mapUrl);
 
             setTimeout(() => {
@@ -244,10 +240,8 @@ function gameCountdown() {
                 console.log("Spieler 1:", SelectedP1.id);
                 console.log("Spieler 2:", SelectedP2.id);
                 console.log("mapUrl", mapUrl);
-                // window.location.href = '../index.html';  // das ist die verlinkung zum spiel
+                window.location.href = '../index.html';  // das ist die verlinkung zum spiel
             }, 4000);
 }
 
 // export {SelectedMap, SelectedP1, SelectedP2}
-
-// die map kann noch nicht aus der gezogen werden
