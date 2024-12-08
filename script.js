@@ -1,13 +1,20 @@
 // Initialisiere Canvas
 
-import { SelectedMap, SelectedP1, SelectedP2 } from "./menu/menu.js";
+// import { SelectedMap, SelectedP1, SelectedP2 } from "./menu/menu.js";
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 400;
+const p1Name = sessionStorage.getItem("SelectedP1");
+const p2Name = sessionStorage.getItem("SelectedP2");
+const mappymaus = sessionStorage.getItem("SelectedMap");
+
+console.log("player1: ",p1Name);
+console.log("player2: ",p2Name);
+console.log("map", mappymaus);
 
 const background = new Image();
-background.src = "./assets/background/Rusted_4.webp";
+background.src = mappymaus;
 
 // Hintergrund zeichnen/async damit der Background laden kann
 background.onload = () => {
@@ -356,8 +363,8 @@ class Player {
 }
 
 // Spieler erstellen
-const player1 = new Player(100, "bancho");
-const player2 = new Player(500, "battingGirl");
+const player1 = new Player(100, p1Name);
+const player2 = new Player(500, p2Name);
 
 function drawPlayer(player) {
   const config = characterConfig[player.character][player.action || "idle"];
@@ -986,8 +993,62 @@ requestAnimationFrame(gameLoop);
 }
 
 // Pause-Funktion
-const pause = document.getElementById("pause");
-pause.addEventListener("click", () => {
-  isPaused = !isPaused;
-  pause.textContent = isPaused ? "play" : "pause";
+// const pause = document.getElementById("pause");
+// pause.addEventListener("click", () => {
+//   isPaused = !isPaused;
+//   pause.textContent = isPaused ? "play" : "pause";
+// });
+
+
+
+const pause = document.getElementById('pause')
+pause.addEventListener('click', pauseGame);
+
+function pauseGame() {
+  if (!isPaused) {
+    // Create a pause overlay instead of replacing the entire container
+    const pauseOverlay = document.createElement('div');
+    pauseOverlay.id = 'pause-screen';
+    pauseOverlay.innerHTML = `
+      <h1>PAUSED</h1>
+      <button id="resume">resume</button>
+      <button id="restart">restart</button>
+      <button id="quit">quit</button>
+    `;
+    pauseOverlay.style.position = 'absolute';
+    pauseOverlay.style.top = '0';
+    pauseOverlay.style.left = '0';
+    pauseOverlay.style.width = '100%';
+    pauseOverlay.style.height = '100%';
+    pauseOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    pauseOverlay.style.display = 'flex';
+    pauseOverlay.style.flexDirection = 'column';
+    pauseOverlay.style.justifyContent = 'center';
+    pauseOverlay.style.alignItems = 'center';
+    pauseOverlay.style.zIndex = '1000';
+
+    document.getElementById('game-container').appendChild(pauseOverlay);
+    pause.textContent = 'play';
+    isPaused = true;
+  } else {
+    // Remove only the pause screen, keeping the game container intact
+    const pauseScreen = document.getElementById('pause-screen');
+    if (pauseScreen) {
+      pauseScreen.remove();
+    }
+    pause.textContent = "pause";
+    isPaused = false;
+  }
+}
+
+// Modify the event listener to work with the new pause overlay
+document.getElementById('game-container').addEventListener('click', (e) => {
+  if (e.target.id === 'resume') {
+    pauseGame(); // This will remove the pause screen
+  } else if (e.target.id === 'restart') {
+    location.href = 'index.html'; // da es statisch is wird das spiel neu gestarten / not the best way
+  }else if (e.target.id === "quit"){
+    console.log("i am quitting");
+    window.location.href = "loading.html"
+  }
 });
