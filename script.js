@@ -29,8 +29,8 @@ function drawBackground() {
 const characterConfig = {
   bancho: {
     sounds: {
-      attack1: "./assets/sounds/bancho_attack1.mp3",
-      attack2: "./assets/sounds/bancho_attack2.mp3",
+      attack1: "./assets/sounds/Deadly Kombat Free version (1)/body_hit_small_11.wav",
+      attack2: "./assets\sounds\Deadly Kombat Free version (1)\body_hit_large_76.wav",
       jump: "./assets/sounds/bancho_jump.mp3",
       hurt: "./assets/sounds/bancho_hurt.mp3",
       block: "./assets/sounds/bancho_block.mp3",
@@ -322,15 +322,25 @@ class Player {
     this.gravity = 0.1;
     this.lastFrameUpdateTime = 0;
     this.facing = "right";
-
-    // Block-Mechanik
-    this.blockDamageTaken = 0; // Angesammelter geblockter Schaden
-    this.isStunned = false; // Status, ob der Spieler gestunned ist
-    this.blockResetTimeout = null; // Timer für das Zurücksetzen des Block-Schadens
-
-    // Separate Hitboxes
+    this.blockDamageTaken = 0;
+    this.isStunned = false;
+    this.blockResetTimeout = null;
     this.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
     this.defenderHitbox = { x: 0, y: 0, width: 0, height: 0 };
+    this.sounds = this.loadSounds(character); // Sounds laden
+  }
+
+  loadSounds(character) {
+    const sounds = {};
+    const soundConfig = characterConfig[character]?.sounds;
+    if (soundConfig) {
+      Object.entries(soundConfig).forEach(([action, src]) => {
+        const audio = new Audio(src);
+        audio.volume = 0.5; // Standardlautstärke
+        sounds[action] = audio;
+      });
+    }
+    return sounds;
   }
 
   resetBlockDamage() {
@@ -338,29 +348,28 @@ class Player {
     console.log(`${this.character}: Block-Schaden zurückgesetzt.`);
   }
 
-
-
   updateDefenderHitbox() {
-    
     const config = characterConfig[this.character]?.defenderHitbox?.[this.facing];
-    
     if (!config) {
       console.error(`Defender hitbox configuration not found for facing: ${this.facing}`);
       return;
     }
-  
     this.defenderHitbox = {
       x: this.x + config.offsetX,
       y: this.y + config.offsetY,
       width: config.width,
       height: config.height,
-    };}
+    };
+  }
+
   setCharacter(character) {
     this.character = character;
     this.action = "idle";
     this.currentFrame = 0; // Animation zurücksetzen
+    this.sounds = this.loadSounds(character); // Sounds erneut laden
   }
 }
+
 
 // Spieler erstellen
 const player1 = new Player(100, p1Name);
@@ -654,7 +663,7 @@ function update() {
 function triggerAttack(player, attackType) {
   const attackConfig = characterConfig[player.character][attackType];
   if (!attackConfig || !player.canAttack) {
-    console.warn(`Cannot trigger attack: ${attackType} for ${player.character}. Reason: Invalid config or attack cooldown.`);
+    console.warn(`Cannot trigger attack: ${attackType} for ${player.character}.`);
     return;
   }
 
@@ -667,9 +676,9 @@ function triggerAttack(player, attackType) {
     sound.play();
   }
 
-  player.action = attackType; // Angriff starten
-  player.currentFrame = 0; // Animation von Anfang starten
-  player.canAttack = false; // Während des Angriffs keine neuen Aktionen erlauben
+  player.action = attackType;
+  player.currentFrame = 0;
+  player.canAttack = false;
 
   // Hitbox-Daten setzen
   const hitboxConfig = attackConfig.hitbox[player.facing];
@@ -680,13 +689,10 @@ function triggerAttack(player, attackType) {
     height: hitboxConfig.height,
   };
 
-  console.log(`Attack hitbox for ${player.character}:`, player.attackHitbox);
-
   // Schadensprüfung nach Verzögerung auslösen
   const damageDelay = Math.floor(attackConfig.frames / 2) * attackConfig.speed;
   setTimeout(() => {
     if (!player.damageDealt) {
-      console.log(`Checking damage for ${player.character} during attack: ${attackType}`);
       checkAttackConnect(player, player === player1 ? player2 : player1, attackType === "attack1" ? 10 : 20);
     }
   }, damageDelay);
@@ -694,11 +700,10 @@ function triggerAttack(player, attackType) {
   // Animation vollständig ablaufen lassen
   const animationDuration = attackConfig.frames * attackConfig.speed;
   setTimeout(() => {
-    console.log(`Attack animation finished for ${player.character}`);
-    player.action = "idle"; // Zurück zur Idle-Animation
-    player.canAttack = true; // Spieler kann wieder angreifen
-    player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Hitbox zurücksetzen
-    player.damageDealt = false; // Schaden-Status zurücksetzen
+    player.action = "idle";
+    player.canAttack = true;
+    player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 };
+    player.damageDealt = false;
   }, animationDuration);
 }
 
