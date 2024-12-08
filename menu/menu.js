@@ -16,8 +16,8 @@ if(menu){
 // das /* hmtl */ wird verwendet um Syntaxhighlighting zu aktivieren, kann aber nur verwendet werden wenn man das nötige Plugin installiert hat.
 menu.innerHTML = /* html */ ` 
 <div id="bancho" class="character collected"><p class="playerName"></p><p>Bancho</p></div>
-<div id="battingGirl" class="character collected"><p class="playerName"></p><p>battingGirl</p></div>
-<div id="bruteArms" class="character collected"><p class="playerName"></p><p>bruteArms</p></div>
+<div id="battingGirl" class="character collected"><p class="playerName"></p><p>Batty</p></div>
+<div id="bruteArms" class="character collected"><p class="playerName"></p><p>Brutus</p></div>
 <div id="character4" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character5" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character6" class="character"><p class="playerName"></p><p>Coming Soon</p></div>

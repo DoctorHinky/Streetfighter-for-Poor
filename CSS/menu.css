@@ -1,3 +1,13 @@
+@font-face {
+    font-family: "pixelFont";
+    src: url(../assets/Fonts/prstart.ttf);
+}
+
+body{
+    font-family: "pixelFont", "monospace";
+}
+
+
 main{
     width: 800px;
     height: 400px;
@@ -31,7 +41,7 @@ main{
     align-items: center;
     flex-direction: column;
     padding-bottom: 10px;
-    font-size: 1.5rem;
+    font-size: 1rem;
 
     p{
         display: inline-block;

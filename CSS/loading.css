@@ -3,6 +3,11 @@
     padding: 0;
     box-sizing: border-box;
 }
+@font-face {
+    font-family: "pixelFont";
+    src: url(../assets/Fonts/prstart.ttf);
+}
+
 
 body {
     height: 100vh;
@@ -11,15 +16,16 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
+    font-family: "pixelFont" ,"monospace";
 }
 
 h1 {
-    font-size: 12rem;
+    font-size: 6rem;
     text-shadow: 5px 10px 5px black;
     color: rgb(255, 215, 182);
 
     &::first-letter {
-        font-size: 17rem;
+        font-size: 10rem;
     }
 }
 
@@ -28,7 +34,8 @@ button {
     width: 600px;
     background: none;
     border: none;
-    font-size: 5rem;
+    font-size: 3rem;
+    font-family: "pixelFont", "monospace";
     font-weight: bold;
     color: rgb(174, 245, 174);
     text-shadow: 0px 0px 15px black;
@@ -43,8 +50,7 @@ button {
 
 #loading {
     position: relative;
-    font-size: 2em;
-    font-size: 2em;
+    font-size: 1em;
     font-weight: bold;
     color: white;
     border: 2px solid black;
@@ -55,7 +61,8 @@ button {
         content: "loading .";
         position: absolute;
         top: 30%;
-        right: 95%;
+        letter-spacing: 0rem;
+        right: 100%;
         width: 200px;
         animation: loading 3s infinite;
         animation-play-state: var(--animation-before, paused);
