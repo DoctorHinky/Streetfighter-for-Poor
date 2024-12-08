@@ -80,7 +80,7 @@ function initCharacterMenu() {
                 target.classList.add('selected');                
                 h1.textContent = "Player 1: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 1";
-            } else if (SelectedP1 === character[target.id]) {
+            } else if (SelectedP1 === target) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Player 2, your turn!";
@@ -98,11 +98,11 @@ function initCharacterMenu() {
         // Player 2 Auswahl und Bestätigung
         else if (playerOneConfirmed && !playerTwoConfirmed && target !== SelectedP1) {
             if (SelectedP2 === null) {
-                SelectedP2 = character[target.id];
+                SelectedP2 = target;
                 target.classList.add('selected');
                 h1.textContent = "Player 2: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 2";
-            } else if (SelectedP2 === character[target.id]) {
+            } else if (SelectedP2 === target) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Selection Complete!";                
