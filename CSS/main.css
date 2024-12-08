@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "pixelFont";
+  src: url(../assets/Fonts/prstart.ttf);
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -7,7 +12,7 @@ body {
     background-color: #000;
     height: 100vh;
 
-    font-family: monospace;
+    font-family: "pixelFont", "monospace";
 }
 
 #game-container {
@@ -20,8 +25,8 @@ body {
     justify-content: top;
     flex-direction: column;
     box-shadow: 0px 0px 20px 4px skyblue;
-    font-size: 2rem;
-    color: green;    
+    font-size: 1rem;
+    color: green;
 }
 
 @keyframes colorturn{
@@ -32,8 +37,8 @@ body {
 
 
 #timer {
-    font-size: 24px;
-    font-family: monospace;
+    font-size: 1rem;
+    font-family: "pixelFont" ,monospace;
     border-radius: 5px;
     margin: 0 5px;
     min-width: 50px;
@@ -84,6 +89,7 @@ body {
         color: white;
         background-color: transparent;
         border: none;
+        font-family: "pixelFont" ,monospace;
     }
 }
 
@@ -128,7 +134,7 @@ body {
   }
   
   .label {
-    font-size: 16px;
+    font-size: 1rem;
     margin-bottom: 5px;
     color: green;
     background-color: #202020;

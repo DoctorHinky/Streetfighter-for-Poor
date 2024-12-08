@@ -256,6 +256,16 @@ const characterConfig = {
   },
 };
 
+const audios = {
+  ready: new Audio('./assets/sounds/Voiceover Pack/Male/ready.ogg'),
+  drei: new Audio('./assets/sounds/Voiceover Pack/Male/3.ogg'),
+  zwei: new Audio('./assets/sounds/Voiceover Pack/Male/2.ogg'),
+  eins: new Audio('./assets/sounds/Voiceover Pack/Male/1.ogg'),
+  gameover: new Audio('./assets/sounds/Voiceover Pack/Male/game_over.ogg'),
+  go: new Audio('./assets/sounds/Voiceover Pack/Male/go.ogg'),
+  timeOver: new Audio('./assets/sounds/Voiceover Pack/Male/time_over.ogg')
+}
+
 function preloadSprites(config) {
   const promises = [];
 
@@ -308,6 +318,9 @@ preloadSprites(characterConfig)
   
     return sounds;
   }
+
+
+ 
   
 // Spieler-Klasse
 class Player {
@@ -807,43 +820,6 @@ function checkAttackConnect(attacker, defender, damage) {
 }
 
 
-
-
-// function triggerAttack(player, attackType) {
-//   const attackConfig = characterConfig[player.character][attackType];
-//   player.action = attackType; // Starte die Angriffanimation
-//   player.currentFrame = 0; // Animation von Anfang starten
-//   player.canAttack = false; // Spieler kann nicht erneut angreifen
-//   player.damageDealt = false; // Schaden noch nicht verursacht
-
-//   // Hitbox-Daten basierend auf Blickrichtung setzen
-//   const hitboxConfig = attackConfig.hitbox[player.facing];
-//   player.attackHitbox = {
-//     x: player.x + hitboxConfig.offsetX,
-//     y: player.y + hitboxConfig.offsetY,
-//     width: hitboxConfig.width,
-//     height: hitboxConfig.height,
-//   };
-
-//   // Schadensprüfung verzögert starten
-//   const damageDelay = 300; // Verzögerung in ms
-//   const animationDuration = attackConfig.frames * (attackConfig.speed || 100);
-
-//   setTimeout(() => {
-//     if (!player.damageDealt) {
-//       checkAttackConnect(player, player === player1 ? player2 : player1, attackType === "attack1" ? 10 : 20);
-//     }
-//   }, damageDelay);
-
-//   // Angriff zurücksetzen nach Animationsdauer
-//   setTimeout(() => {
-//     player.action = "idle"; // Zurück zur Idle-Animation
-//     player.canAttack = true; // Spieler kann wieder angreifen
-//     player.attackHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Hitbox zurücksetzen
-//     player.damageDealt = false; // Schaden-Status zurücksetzen
-//   }, animationDuration);
-// }
-
 function drawHitbox(hitbox, color = "blue") {
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
@@ -921,6 +897,15 @@ function updateHealth() {
     : player2.health > 30
     ? "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(255,149,0,1) 56%)"
     : "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(167,0,0,1) 64%)";
+
+    if(player1.health <= 0){
+      div.textContent = "Player 2 won!";
+      gameISOver();
+    }
+    if(player2.health <= 0){
+      div.textContent = "Player 1 won!";
+      gameISOver();
+    }
 }
 // Aktion zurücksetzen
 function resetAction(player, delay) {
@@ -939,14 +924,71 @@ function debugPlayer(player) {
   ctx.fillText(`isBlocking: ${player.isBlocking}`, player.x, player.y - 40);
 }
 
+function gameISOver() {
+  gameOver = true;
+  const gameOverScreen = document.createElement('div');
+  gameOverScreen.id = 'pause-screen';
+  audios.gameover.play();
+  gameOverScreen.innerHTML = `
+    <h1>GAME OVER</h1>
+    <button id="restart">Restart</button>
+    <button id="quit">Quit</button>
+  `;
+
+
+  document.getElementById('game-container').appendChild(gameOverScreen);
+  document.getElementById('pause').style.display = 'none';
+}
+
+// initGame und countdown
+
+function initGame() {
+  const countdown = document.createElement("countdown");
+  countdown.id = "pause-screen";
+  document.getElementById("game-container").appendChild(countdown);
+  countdown.innerHTML = `
+    <h1>READY ?</h1>
+    `;
+    audios.ready.play();
+  setTimeout(() => {
+    countdown.innerHTML = `
+      <h1>3</h1>
+    `;
+    audios.drei.play();
+  }, 1000);
+  setTimeout(() => {
+    countdown.innerHTML = `
+      <h1>2</h1>
+    `;
+    audios.zwei.play();
+  }, 2000);
+  setTimeout(() => {
+    countdown.innerHTML = `
+      <h1>1</h1>
+    `;
+    audios.eins.play();
+  }, 3000);
+  setTimeout(() => {
+    countdown.innerHTML = `
+      <h1>FIGHT!</h1>
+    `;
+    audios.go.play();
+  }, 4000);
+  setTimeout(() => {
+    countdown.remove();
+    isPaused = false;
+  }, 5000);
+}
+
 
 
 // Spiel-Loop
 let lastSpriteUpdateTime = 0;
-let isPaused = false;
+let isPaused = true;
+let gameOver = false;
 
 function gameLoop(currentTime) {
-  if (!isPaused) {
+  if (!isPaused && !gameOver) {
     // 1. Canvas löschen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -977,10 +1019,10 @@ function gameLoop(currentTime) {
   // 10. Nächsten Frame anfordern
   requestAnimationFrame(gameLoop);
 }
-
+initGame();
 requestAnimationFrame(gameLoop);
 
-{
+
   let timer = 120;
   const timerDisplay = document.getElementById("timer");
   const div = timerDisplay.parentElement;
@@ -991,6 +1033,7 @@ requestAnimationFrame(gameLoop);
         timer--;
         timerDisplay.textContent = timer;
       } else if (timer <= 0) {
+        audios.timeOver.play();
         clearInterval(timerInterval);
         if (player1.health > player2.health) {
           div.textContent = "PLAYER 1 WON!";
@@ -1002,15 +1045,6 @@ requestAnimationFrame(gameLoop);
       }
     }, 1000);
   }
-}
-
-// Pause-Funktion
-// const pause = document.getElementById("pause");
-// pause.addEventListener("click", () => {
-//   isPaused = !isPaused;
-//   pause.textContent = isPaused ? "play" : "pause";
-// });
-
 
 
 const pause = document.getElementById('pause')
@@ -1027,17 +1061,6 @@ function pauseGame() {
       <button id="restart">restart</button>
       <button id="quit">quit</button>
     `;
-    pauseOverlay.style.position = 'absolute';
-    pauseOverlay.style.top = '0';
-    pauseOverlay.style.left = '0';
-    pauseOverlay.style.width = '100%';
-    pauseOverlay.style.height = '100%';
-    pauseOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    pauseOverlay.style.display = 'flex';
-    pauseOverlay.style.flexDirection = 'column';
-    pauseOverlay.style.justifyContent = 'center';
-    pauseOverlay.style.alignItems = 'center';
-    pauseOverlay.style.zIndex = '1000';
 
     document.getElementById('game-container').appendChild(pauseOverlay);
     pause.textContent = 'play';
