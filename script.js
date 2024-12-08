@@ -29,12 +29,12 @@ function drawBackground() {
 const characterConfig = {
   bancho: {
     sounds: {
-      attack1: "./assets/sounds/Deadly Kombat Free version (1)/body_hit_small_11.wav",
-      attack2: "./assets\sounds\Deadly Kombat Free version (1)\body_hit_large_76.wav",
-      jump: "./assets/sounds/bancho_jump.mp3",
-      hurt: "./assets/sounds/bancho_hurt.mp3",
-      block: "./assets/sounds/bancho_block.mp3",
-      stun: "./assets/sounds/bancho_stun.mp3",
+      attack1: "./assets/sounds/Deadly Kombat Free version (1)/kick_short_whoosh_12.wav",
+      attack2: "./assets/sounds/Deadly Kombat Free version (1)/kick_long_whoosh_19.wav",
+      jump: "./assets/sounds/Deadly Kombat Free version (1)/somersault_10.wav",
+      hurt: "./assets/sounds/Deadly Kombat Free version (1)/body_hit_large_32.wav",
+      block: "./assets/sounds/Deadly Kombat Free version (1)/block_large_71.wav",
+      stun: "./assets/sounds/Deadly Kombat Free version (1)/face_hit_Large_29.wav",
     },
     stun:{
       frames: 6, // Anzahl der Frames für die Stun-Animation
@@ -72,7 +72,7 @@ const characterConfig = {
       speed: 100,
       hitbox: { 
       right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
-      left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+      left: { offsetX: 0, offsetY: 85, width: 70, height: 100 },
     },
   },
     attack2: {
@@ -82,8 +82,8 @@ const characterConfig = {
       originalFrameHeight: 100,
       speed: 100,
       hitbox: { 
-        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
-        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+        right: { offsetX: 105, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: 20, offsetY: 85, width: 70, height: 100 },
       },
     },
     jump: {
@@ -94,8 +94,8 @@ const characterConfig = {
       speed: 200,
     },
     defenderHitbox: {
-      right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
-      left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
+      right: { offsetX: 40, offsetY: 50, width: 100, height: 150 },
+      left: { offsetX: 60, offsetY: 50, width: 100, height: 150 },
     },
     block: {
       frames: 3, // Anzahl der Frames in der Block-Animation
@@ -107,12 +107,19 @@ const characterConfig = {
   },
   battingGirl: {
     sounds: {
-      attack1: "./assets/sounds/bancho_attack1.mp3",
-      attack2: "./assets/sounds/bancho_attack2.mp3",
-      jump: "./assets/sounds/bancho_jump.mp3",
-      hurt: "./assets/sounds/bancho_hurt.mp3",
-      block: "./assets/sounds/bancho_block.mp3",
-      stun: "./assets/sounds/bancho_stun.mp3",
+      attack1: "./assets/sounds/Deadly Kombat Free version (1)/kick_short_whoosh_12.wav",
+      attack2: "./assets/sounds/Free Sounds Pack/Whoosh 4-1.wav",
+      jump: "./assets/sounds/Deadly Kombat Free version (1)/somersault_01.wav",
+      hurt: "./assets/sounds/Deadly Kombat Free version (1)/body_hit_large_44.wav",
+      block: "./assets/sounds/Deadly Kombat Free version (1)/block_medium_25.wav",
+      stun: "./assets/sounds/Deadly Kombat Free version (1)/face_hit_Large_29.wav",
+    },
+    stun:{
+      frames: 6, // Anzahl der Frames für die Stun-Animation
+      src: "./assets/sprites/BattingGirl/Sprite_Sheet/Batting_Girl-Stun.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 50, // Geschwindigkeit der Stun-Animation
     },
     idle: {
       frames: 12,
@@ -142,8 +149,8 @@ const characterConfig = {
       originalFrameHeight: 100,
       speed: 100,
       hitbox: { 
-        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
-        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+        right: { offsetX: 80, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: 40, offsetY: 85, width: 70, height: 100 },
       },
     },
     attack2: {
@@ -153,8 +160,8 @@ const characterConfig = {
       originalFrameHeight: 100,
       speed: 100,
       hitbox: { 
-        right: { offsetX: 125, offsetY: 85, width: 70, height: 100 },
-        left: { offsetX: -50, offsetY: 85, width: 70, height: 100 },
+        right: { offsetX: 120, offsetY: 85, width: 70, height: 100 },
+        left: { offsetX: 10, offsetY: 85, width: 70, height: 100 },
       },
     },
     jump: {
@@ -165,8 +172,8 @@ const characterConfig = {
       speed: 400,
     },
     defenderHitbox: {
-      right: { offsetX: 50, offsetY: 50, width: 130, height: 150 },
-      left: { offsetX: -180, offsetY: 50, width: 130, height: 150 },
+      right: { offsetX: 30, offsetY: 50, width: 100, height: 150 },
+      left: { offsetX: 80, offsetY: 50, width: 100, height: 150 },
     },
     block: {
       frames: 3,
@@ -178,12 +185,12 @@ const characterConfig = {
   },
   bruteArms: {
     sounds: {
-      attack1: "./assets/sounds/bancho_attack1.mp3",
-      attack2: "./assets/sounds/bancho_attack2.mp3",
-      jump: "./assets/sounds/bancho_jump.mp3",
-      hurt: "./assets/sounds/bancho_hurt.mp3",
-      block: "./assets/sounds/bancho_block.mp3",
-      stun: "./assets/sounds/bancho_stun.mp3",
+      attack1: "./assets/sounds/Deadly Kombat Free version (1)/punch_long_whoosh_21.wav",
+      attack2: "./assets\sounds\Deadly Kombat Free version (1)/kick_long_whoosh_19.wav",
+      jump: "./assets/sounds/Deadly Kombat Free version (1)/somersault_10.wav",
+      hurt: "./assets/sounds/Deadly Kombat Free version (1)/body_hit_large_32.wav",
+      block: "./assets/sounds/Deadly Kombat Free version (1)/block_large_71.wav",
+      stun: "./assets/sounds/Deadly Kombat Free version (1)/face_hit_Large_29.wav",
     },
     idle: {
       frames: 7,
@@ -784,7 +791,7 @@ function checkAttackConnect(attacker, defender, damage) {
           defender.isStunned = false;
           defender.action = "idle";
           defender.resetBlockDamage();
-        }, 2000);
+        }, 4000);
       }
     } else {
       // Schaden zufügen, wenn nicht geblockt wird
