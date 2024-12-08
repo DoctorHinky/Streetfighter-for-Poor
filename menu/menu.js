@@ -9,12 +9,13 @@ let p2MapConfirm = false;
 let SelectedP1 = null;
 let SelectedP2 = null;
 let SelectedMap = null;
+let mapUrl = null;
 let confirmed = {};
 let playerOneConfirmed = false;
 let playerTwoConfirmed = false;
 if(menu){
-
-menu.innerHTML = /* html */ `
+// das /* hmtl */ wird verwendet um Syntaxhighlighting zu aktivieren, kann aber nur verwendet werden wenn man das nötige Plugin installiert hat.
+menu.innerHTML = /* html */ ` 
 <div id="bancho" class="character collected"><p class="playerName"></p><p>Bancho</p></div>
 <div id="batty" class="character collected"><p class="playerName"></p><p>Batty</p></div>
 <div id="brutus" class="character collected"><p class="playerName"></p><p>Brutus</p></div>
@@ -38,6 +39,8 @@ const batty = new Character("batty", "url(characterImg/BattingGirl_Idle1.png)");
 const brutus = new Character("brutus", "url(characterImg/BruteArm_Idle1.png)");
 const placeHolder = new Character("placeholder", "url(characterImg/placesHolder.png)");
 
+
+// das ist eine Hilfsfunktion um den Hintergrund der Charaktere zu setzen
 function setBackground(id, url) {
     document.getElementById(id).style.background = `${url} center center/cover no-repeat`;
 }
@@ -74,16 +77,16 @@ function initCharacterMenu() {
         // Player 1 Auswahl und Bestätigung
         if (!playerOneConfirmed) {
             if (SelectedP1 === null) {
-                SelectedP1 = character[target.id];
+                SelectedP1 = target;
                 target.classList.add('selected');
-                console.log(SelectedP1.name);
+                // console.log(SelectedP1.name); // debuggin um zu überpfüfen welcher character gespeichert wird. hier wird nur der name geloggt.
                 
-                h1.textContent = "Player 1: Confirm your Selection";
+                h1.textContent = "Player 1: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 1";
-            } else if (SelectedP1 === character[target.id]) {
+            } else if (SelectedP1 === target) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
-                h1.textContent = "Player 2: Select your Character";
+                h1.textContent = "Player 2, your turn!";
                 playerOneConfirmed = true;
                 confirmed.P1 = target.id;
             } else {
@@ -94,17 +97,16 @@ function initCharacterMenu() {
                 target.querySelector('.playerName').textContent = "Player 1";
             }
 
-            console.log(SelectedP1);
-            
+           // console.log(SelectedP1); // debuggin um zu überpfüfen welcher character gespeichert wird, hier wird das ganze objekt ausgegeben.
         }
         // Player 2 Auswahl und Bestätigung
         else if (playerOneConfirmed && !playerTwoConfirmed && target !== SelectedP1) {
             if (SelectedP2 === null) {
-                SelectedP2 = character[target.id];
+                SelectedP2 = target;
                 target.classList.add('selected');
-                h1.textContent = "Player 2: Confirm your Selection";
+                h1.textContent = "Player 2: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 2";
-            } else if (SelectedP2 === character[target.id]) {
+            } else if (SelectedP2 === target) {
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Selection Complete!";
@@ -134,7 +136,9 @@ function initMapMenu() {
         h1.textContent = 'Select your Map';
         menu.classList.remove('menu');
         menu.classList.add('mapMenu');
-        menu.innerHTML = /* html */ `
+
+        // beachte das /* hmtl */ wieder mal um Syntaxhighlighting zu aktivieren
+        menu.innerHTML = /* html */ ` 
         <div id="showCaseContainer">
             <div id="P1Head" class="playerHead">P1</div>
             <div id="showCase">my Map</div>
@@ -161,13 +165,13 @@ function initMapMenu() {
         setBackground('map6', 'url(../assets/background/postapocalypse4.png)');
         setBackground('map7', 'url(../assets/background/Rusted_4.webp)');
         setBackground('map8', 'url(../assets/background/slums.png)');
-        document.getElementById('P1Head').style.background = `${SelectedP1.url} center center/cover no-repeat`;
-        document.getElementById('P2Head').style.background = `${SelectedP2.url} center center/cover no-repeat`;
+        document.getElementById('P1Head').style.background = SelectedP1.style.background;
+        document.getElementById('P2Head').style.background = SelectedP2.style.background;
         
         
         menu.addEventListener('click', (e) => {
             const target = e.target.closest('.map');
-            if (!target) return;
+            if (!target) return; // wenn das target nicht die klasse map hat, dann wird die funktion abgebrochen
             if(!target.classList.contains('map') && !target.classList.contains('playerHead')) return;
                 p1MapConfirm = false;
                 p2MapConfirm = false;
@@ -182,6 +186,9 @@ function initMapMenu() {
                 document.getElementById('showCase').textContent = target.textContent;
     
                 document.body.style.background = target.style.background;
+                const background = target.style.background;
+                mapUrl = background.match(/url\((['"]?)(.*?)\1\)/)?.[2] || null; // regex um die url aus dem background zu extrahieren
+                
         });
     
         menu.addEventListener('click', (e) => {
@@ -220,10 +227,7 @@ function gameCountdown() {
 
     sessionStorage.setItem('SelectedP1', SelectedP1.name);
     sessionStorage.setItem('SelectedP2', SelectedP2.name);
-    sessionStorage.setItem('SelectedMap', SelectedMap.url);
-
-    console.log(SelectedP1.name, SelectedP2.name, SelectedMap.url);
-    
+    sessionStorage.setItem('SelectedMap', mapUrl);
 
             setTimeout(() => {
                 h1.textContent = 3;
@@ -234,12 +238,16 @@ function gameCountdown() {
             setTimeout(() => {
                 h1.textContent = 1;
             }, 3000);
+
             setTimeout(() => {
                 h1.textContent = 'HIER MUSS NOCH TEXT REIN!';
+                console.log("Spieler 1:", SelectedP1.id);
+                console.log("Spieler 2:", SelectedP2.id);
+                console.log("mapUrl", mapUrl);
                 // window.location.href = '../index.html';  // das ist die verlinkung zum spiel
             }, 4000);
 }
 
-export {SelectedMap, SelectedP1, SelectedP2}
+// export {SelectedMap, SelectedP1, SelectedP2}
 
 // die map kann noch nicht aus der gezogen werden
