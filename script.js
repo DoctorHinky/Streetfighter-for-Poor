@@ -900,10 +900,12 @@ function updateHealth() {
 
     if(player1.health <= 0){
       div.textContent = "Player 2 won!";
+      audios.gameover.play();
       gameISOver();
     }
     if(player2.health <= 0){
       div.textContent = "Player 1 won!";
+      audios.gameover.play();
       gameISOver();
     }
 }
@@ -928,14 +930,11 @@ function gameISOver() {
   gameOver = true;
   const gameOverScreen = document.createElement('div');
   gameOverScreen.id = 'pause-screen';
-  audios.gameover.play();
   gameOverScreen.innerHTML = `
     <h1>GAME OVER</h1>
     <button id="restart">Restart</button>
     <button id="quit">Quit</button>
   `;
-
-
   document.getElementById('game-container').appendChild(gameOverScreen);
   document.getElementById('pause').style.display = 'none';
 }
@@ -1035,6 +1034,8 @@ requestAnimationFrame(gameLoop);
       } else if (timer <= 0) {
         audios.timeOver.play();
         clearInterval(timerInterval);
+
+        gameISOver();
         if (player1.health > player2.health) {
           div.textContent = "PLAYER 1 WON!";
         } else if (player2.health > player1.health) {
