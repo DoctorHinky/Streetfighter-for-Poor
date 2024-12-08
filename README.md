@@ -4,12 +4,12 @@ Einfaches Streetfighter game
 
 ## Todo liste:
 
-
-- effekte, wetter, schlagen 
-- sounds, gewitter, schlagen, jump etc
-- map und character select
-- evtl. 3 akt
-- Unterschiedliche timer 
-? Menu erstellen
-- pause sceen
-- hitboxen anpassen an attacks und charaktere
+-sprite fix for bruteArms and stun battingGirl M
+-Combat Sounds add M
+-Menu Sounds integration N
+-Stage Sounds Add M/N
+-voiceover add N
+-winning screen N
+-fight start message N
+-hitbox positioning and attack balancing M
+-Dokumentation
