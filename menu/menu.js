@@ -2,8 +2,16 @@ console.log("menu.js loaded");
 const menu = document.querySelector('main');
 const h1 = document.querySelector('h1');
 
-// confirm variablen, diese werden auf true gesetzt, wenn der Spieler seine Auswahl bestätigt
 
+// confirm variablen, diese werden auf true gesetzt, wenn der Spieler seine Auswahl bestätigt
+const menuMusic = new Audio('.././assets/sounds/BGMusik/Arp & Synth Music/Menu.mp3');
+menuMusic.volume = 0.3;
+menuMusic.loop = true;
+
+document.addEventListener('DOMContentLoaded', () => {
+    menuMusic.play().catch(err => console.error("konnte nicht abspielen: ", err));
+}
+);
 let p1MapConfirm = false;
 let p2MapConfirm = false;
 let SelectedP1 = null;
@@ -16,14 +24,25 @@ if(menu){
 // das /* hmtl */ wird verwendet um Syntaxhighlighting zu aktivieren, kann aber nur verwendet werden wenn man das nötige Plugin installiert hat.
 menu.innerHTML = /* html */ ` 
 <div id="bancho" class="character collected"><p class="playerName"></p><p>Bancho</p></div>
-<div id="battingGirl" class="character collected"><p class="playerName"></p><p>battingGirl</p></div>
-<div id="bruteArms" class="character collected"><p class="playerName"></p><p>bruteArms</p></div>
+<div id="battingGirl" class="character collected"><p class="playerName"></p><p>Batty</p></div>
+<div id="bruteArms" class="character collected"><p class="playerName"></p><p>Brutus</p></div>
 <div id="character4" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character5" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character6" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character7" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character8" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 `;
+}
+
+const mapMusic = {
+    map1: "",
+    map2: "",
+    map3: "",
+    map4: "",
+    map5: "",
+    map6: "",
+    map7: "",
+    map8: ""
 }
 // das erstellen der CharakterClass um nicht für jede ein objekt zu machen
 class Character {
@@ -37,6 +56,9 @@ const bancho = new Character("bancho", "url(characterImg/Bancho_Idle1.png)");
 const battingGirl = new Character("battingGirl", "url(characterImg/BattingGirl_Idle1.png)");
 const bruteArms = new Character("bruteArms", "url(characterImg/BruteArm_Idle1.png)");
 const placeHolder = new Character("placeholder", "url(characterImg/placesHolder.png)");
+
+const Clicksound = new Audio('.././assets/sounds/Free Sounds Pack/Interface 1-1.wav');
+const confimy = new Audio('.././assets/sounds/Free Sounds Pack/Magical Interface 5-1.wav');
 
 
 // das ist eine Hilfsfunktion um den Hintergrund der Objekte zu setzen zu setzen
@@ -69,6 +91,7 @@ const character = {
 // Event Listener
 function initCharacterMenu() {
     menu.addEventListener('click', (e) => {
+        
         const target = e.target.closest('.character');
     
         if (!target || !target.classList.contains('collected') || target.classList.contains('confirmed')) return;
@@ -76,16 +99,19 @@ function initCharacterMenu() {
         // Player 1 Auswahl und Bestätigung
         if (!playerOneConfirmed) {
             if (SelectedP1 === null) {
+                Clicksound.play().catch(err => console.error("konnte nicht abspielen: ", err));             
                 SelectedP1 = target; // es wird das ganze hmtl objekt gespiechert aus welchem nachher das nur die Id extrahiert wird.
-                target.classList.add('selected');                
+                target.classList.add('selected'); 
                 h1.textContent = "Player 1: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 1";
             } else if (SelectedP1 === target) {
+                confimy.play().catch(err => console.error("konnte nicht abspielen: ", err));             
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Player 2, your turn!";
                 playerOneConfirmed = true;
             } else {
+                Clicksound.play().catch(err => console.error("konnte nicht abspielen: ", err));             
                 SelectedP1.classList.remove('selected');
                 SelectedP1.querySelector('.playerName').textContent = "";
                 target.classList.add('selected');
@@ -98,16 +124,19 @@ function initCharacterMenu() {
         // Player 2 Auswahl und Bestätigung
         else if (playerOneConfirmed && !playerTwoConfirmed && target !== SelectedP1) {
             if (SelectedP2 === null) {
+                Clicksound.play().catch(err => console.error("konnte nicht abspielen: ", err));             
                 SelectedP2 = target;
                 target.classList.add('selected');
                 h1.textContent = "Player 2: Click again on the same character to confirm";
                 target.querySelector('.playerName').textContent = "Player 2";
             } else if (SelectedP2 === target) {
+                confimy.play().catch(err => console.error("konnte nicht abspielen: ", err));             
                 target.classList.remove('selected');
                 target.querySelector('.playerName').classList.add('confirmed');
                 h1.textContent = "Selection Complete!";                
                 playerTwoConfirmed = true;
             } else {
+                Clicksound.play().catch(err => console.error("konnte nicht abspielen: ", err));
                 SelectedP2.classList.remove('selected');
                 SelectedP2.querySelector('.playerName').textContent = "";
                 target.classList.add('selected');
@@ -163,9 +192,11 @@ function initMapMenu() {
         
         
         menu.addEventListener('click', (e) => {
+
             const target = e.target.closest('.map');
             if (!target) return; // wenn das target nicht die klasse map hat, dann wird die funktion abgebrochen
             if(!target.classList.contains('map') && !target.classList.contains('playerHead')) return;
+            Clicksound.play().catch(err => console.error("konnte nicht abspielen: ", err));
                 p1MapConfirm = false;
                 p2MapConfirm = false;
                 document.getElementById('P1Head').style.boxShadow = '0px 0px 10px 5px #fff';
@@ -191,10 +222,12 @@ function initMapMenu() {
             if (!target) return;
             
             if(SelectedMap !== null && target.id === 'P1Head'){
+                confimy.play().catch(err => console.error("konnte nicht abspielen: ", err));
                 document.getElementById('P1Head').style.boxShadow = '0 0 10px 5px #0f0';
                 document.getElementById('P1Head').classList.add('confirmed');
                 p1MapConfirm = true;
             } else if(SelectedMap !== null && target.id === 'P2Head'){
+                confimy.play().catch(err => console.error("konnte nicht abspielen: ", err));
                 document.getElementById('P2Head').style.boxShadow = '0 0 10px 5px #0f0';
                 document.getElementById('P2Head').classList.add('confirmed');
                 p2MapConfirm = true;
@@ -211,37 +244,12 @@ function initMapMenu() {
         });
     }
 }
-
-    
-
-
-
 function gameCountdown() {
-    h1.textContent = 'Game starting in';
-    h1.style.fontSize = '3rem';
-    h1.style.color = '#ff0';
+    setTimeout(() => {
+        sessionStorage.setItem('SelectedP1', SelectedP1.id);
+        sessionStorage.setItem('SelectedP2', SelectedP2.id);
+        sessionStorage.setItem('SelectedMap', mapUrl);
 
-    sessionStorage.setItem('SelectedP1', SelectedP1.id);
-    sessionStorage.setItem('SelectedP2', SelectedP2.id);
-    sessionStorage.setItem('SelectedMap', mapUrl);
-
-            setTimeout(() => {
-                h1.textContent = 3;
-            }, 1000);        
-            setTimeout(() => {
-                h1.textContent = 2;
-            }, 2000);
-            setTimeout(() => {
-                h1.textContent = 1;
-            }, 3000);
-
-            setTimeout(() => {
-                h1.textContent = 'HIER MUSS NOCH TEXT REIN!';
-                console.log("Spieler 1:", SelectedP1.id);
-                console.log("Spieler 2:", SelectedP2.id);
-                console.log("mapUrl", mapUrl);
-                window.location.href = '../index.html';  // das ist die verlinkung zum spiel
-            }, 4000);
+    window.location.href = '../index.html';  // das ist die verlinkung zum spiel
+    }, 1000);           
 }
-
-// export {SelectedMap, SelectedP1, SelectedP2}

@@ -1,6 +1,10 @@
 const LoadingScreen = document.getElementById('loading');
 
-document.addEventListener("DOMContentLoaded", console.log('loaded'));
+const loadingMusic = new Audio('.././assets/sounds/BGMusik/Arp & Synth Music/Char Select.mp3');
+loadingMusic.volume = 0.3;
+loadingMusic.loop = true;
+
+document.addEventListener("DOMContentLoaded", loadingMusic.play().catch(err => console.log(err)));
 
 document.addEventListener("keydown", (e) => {
     if(e.key === "Enter"){
