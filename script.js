@@ -36,6 +36,13 @@ const characterConfig = {
       block: "./assets/sounds/Deadly Kombat Free version (1)/block_large_71.wav",
       stun: "./assets/sounds/Deadly Kombat Free version (1)/face_hit_Large_29.wav",
     },
+    loose: {
+      frames: 4,
+      src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_Hurt.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 100,
+    },
     stun:{
       frames: 6, // Anzahl der Frames für die Stun-Animation
       src: "./assets/sprites/Bancho/Sprite_Sheet/Bancho_stun.png",
@@ -113,6 +120,13 @@ const characterConfig = {
       hurt: "./assets/sounds/Deadly Kombat Free version (1)/body_hit_large_44.wav",
       block: "./assets/sounds/Deadly Kombat Free version (1)/block_medium_25.wav",
       stun: "./assets/sounds/Deadly Kombat Free version (1)/face_hit_Large_29.wav",
+    },
+    loose: {
+      frames: 5,
+      src: "./assets/sprites/BattingGirl/Sprite_Sheet/BattingGirl_Hurt-Sheet.png",
+      originalFrameWidth: 100,
+      originalFrameHeight: 100,
+      speed: 100,
     },
     stun:{
       frames: 6, // Anzahl der Frames für die Stun-Animation
