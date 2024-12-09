@@ -4,12 +4,17 @@ Einfaches Streetfighter game
 
 ## Todo liste:
 
--sprite fix for bruteArms and stun battingGirl M *
--Combat Sounds add M *
--Menu Sounds integration N
--Stage Sounds Add M/N
--voiceover add N *
--winning screen N *
--fight start message N 
--hitbox positioning and attack balancing M
--Dokumentation
+test branch erstellen und debbug für main entfernen
+
+loose animation einfügen
+
+alley -The Stalker
+back alley - Club Hell
+main street - paralax city
+postapocalypse 3- android dance
+postapocalypse 4- leather jacket
+You
+1:14 AM
+rusted 4- club heaven
+slums - commerce gloss
+studio - crystal mountains
