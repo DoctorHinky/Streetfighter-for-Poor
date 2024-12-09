@@ -4,12 +4,12 @@ const loadingMusic = new Audio('.././assets/sounds/BGMusik/Arp & Synth Music/Cha
 loadingMusic.volume = 0.3;
 loadingMusic.loop = true;
 
-document.addEventListener("DOMContentLoaded", loadingMusic.play().catch(err => console.log(err)));
 
 document.addEventListener("keydown", (e) => {
     if(e.key === "Enter"){
         console.log("Enter pressed");
         
+        loadingMusic.play().catch(err => console.log(err));
         LoadingScreen.style.setProperty('--animation-before', 'running');
         LoadingScreen.style.setProperty('--animation-after', 'running');
 

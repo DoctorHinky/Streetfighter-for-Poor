@@ -1101,7 +1101,7 @@ document.getElementById('game-container').addEventListener('click', (e) => {
   if (e.target.id === 'resume') {
     pauseGame(); // This will remove the pause screen
   } else if (e.target.id === 'restart') {
-    location.href = 'index.html'; // da es statisch is wird das spiel neu gestarten / not the best way
+    location.href = 'game.html'; // da es statisch is wird das spiel neu gestarten / not the best way
   }else if (e.target.id === "quit"){
     console.log("i am quitting");
     window.location.href = "loading.html"

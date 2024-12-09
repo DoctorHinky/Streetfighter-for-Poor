@@ -1,0 +1,17 @@
+{
+  "name": "streetfighter-for-poor",
+  "version": "1.0.0",
+  "description": "Dies ist ein Kampfspiel-Projekt, das sich noch in der Entwicklung befindet, bei dem Spieler mit animierten Charakteren gegeneinander kämpfen können. Das Projekt verwendet HTML, CSS und JavaScript (mit einem Fokus auf Spielmechaniken wie Animationen, Hitboxes, Spieleraktionen und Kollisionserkennung). Es ist ein kostenloses, Open-Source-Projekt, das kontinuierlich mit neuen Funktionen und Verbesserungen aktualisiert wird.",
+  "main": "loading.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "game, streetfighter, html, css, JavaScript"
+  ],
+  "author": "Norman Tetzlaff, Mark Döring",
+  "license": "ISC",
+  "dependencies": {
+    "gh-pages": "^6.2.0"
+  }
+}

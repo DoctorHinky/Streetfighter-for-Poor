@@ -277,6 +277,6 @@ function gameCountdown() {
             sessionStorage.setItem('SelectedMusic', mapMusic[SelectedMap.id]);
         }
 
-        window.location.href = '../index.html';  // das ist die verlinkung zum spiel
+        window.location.href = '../game.html';  // das ist die verlinkung zum spiel
     }, 1000);           
 }

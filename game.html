@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Norman Tetzlaff, Mark Thortinson">
+    <meta name="description" content="Basic struktured streetfighter game">
+    <link rel="stylesheet" href="./CSS/main.css">
+    <title>Urban BrawlerZ</title>
+</head>
+<body>
+    <div id="game-container">
+        <div id="pause">pause</div>
+        <div id="ui">
+            <!-- Player 1 Health Bar -->
+            <div class="health-bar-container" id="player1-bar">
+                <span class="label">Player 1</span>
+                <div class="health-bar">
+                    <div class="health-fill" id="player1-health"></div>
+                </div>
+            </div>
+            <div id="timer">120</div>
+
+            <!-- Player 2 Health Bar -->
+            <div class="health-bar-container" id="player2-bar">
+                <span class="label">Player 2</span>
+                <div class="health-bar">
+                    <div class="health-fill" id="player2-health"></div>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>
