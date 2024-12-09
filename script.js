@@ -8,10 +8,19 @@ canvas.height = 400;
 const p1Name = sessionStorage.getItem("SelectedP1");
 const p2Name = sessionStorage.getItem("SelectedP2");
 const mappymaus = sessionStorage.getItem("SelectedMap");
+const selectedMusic = sessionStorage.getItem("SelectedMusic");
 
 console.log("player1: ",p1Name);
 console.log("player2: ",p2Name);
 console.log("map", mappymaus);
+
+if (selectedMusic) {
+  const mapMusic = new Audio(selectedMusic);
+  mapMusic.loop = true;
+  mapMusic.volume = 0.3;
+  mapMusic.play().catch(err => console.error("Konnte die Musik nicht abspielen:", err));
+}
+
 
 const background = new Image();
 background.src = mappymaus;
@@ -490,45 +499,50 @@ function updateAnimationFrames(currentTime) {
     if (currentTime - player.lastFrameUpdateTime >= speed) {
       player.lastFrameUpdateTime = currentTime;
 
-      // Spezielle Block-Logik
+      // Block-Animation
       if (player.action === "block") {
         if (player.currentFrame < config.frames - 1) {
-          player.currentFrame++; // Nächsten Frame anzeigen
+          player.currentFrame++;
         }
-        // Am letzten Frame bleiben, solange geblockt wird
-        return; // Keine weitere Logik ausführen
+        return;
       }
 
       // Stun-Animation loopen
       if (player.action === "stun") {
         player.currentFrame++;
         if (player.currentFrame >= config.frames) {
-          player.currentFrame = 0; // Zurück zum ersten Frame, um die Animation zu loopen
+          player.currentFrame = 0; 
         }
-        return; // Keine weitere Logik ausführen
+        return; 
       }
 
-      // Normale Animationslogik für andere Aktionen
+      // Normale Animationslogik
       player.currentFrame++;
 
-      // console.log(
-      //   `Player: ${player.character}, Action: ${player.action}, Current Frame: ${player.currentFrame}`
-      // );
+      // Lose-Animation direkt hier behandeln und returnen
+      if (player.action === "loose") {
+        // Stelle sicher, dass der Frame nicht über die maximale Anzahl hinausgeht
+        if (player.currentFrame >= config.frames) {
+          player.currentFrame = config.frames - 1; // auf letztem Frame bleiben
+        }
+        // Keine weitere Logik ausführen
+        return; 
+      }
 
-      // Animation zurücksetzen, wenn sie beendet ist
+      // Angriff abgeschlossen? Dann zurück auf Idle
       if (player.currentFrame >= config.frames) {
         if (player.action.startsWith("attack")) {
-          player.action = "idle"; // Zurück zur Idle-Animation nach Attacke
+          player.action = "idle";
         }
-        player.currentFrame = 0; // Zurück zum ersten Frame
+        player.currentFrame = 0;
       }
     }
   };
 
-  // Spieler 1 und 2 Frames aktualisieren
   updateFrame(player1);
   updateFrame(player2);
 }
+
 
 const keys = {};
 window.addEventListener("keydown", (e) => {
@@ -891,21 +905,25 @@ function updateHealth() {
     ? "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(255,149,0,1) 56%)"
     : "linear-gradient(270deg, rgba(80,80,80,1) 0%, rgba(167,0,0,1) 64%)";
 
-    if(player1.health <= 0){
+    if (player1.health <= 0) {
       div.textContent = "Player 2 won!";
       player1.action = "loose";
       audios.gameover.play();
+      // Hier NICHT sofort gameISOver aufrufen oder das Spiel stoppen.
+      // Stattdessen nach einer bestimmten Zeit, die länger als die Lose-Animation dauert, gameISOver aufrufen:
       setTimeout(() => {
         gameISOver();
-      }, 3000);
+      }, 2000); // 2 Sekunden warten, damit die Lose-Animation sichtbar ist
     }
-    if(player2.health <= 0){
+    if (player2.health <= 0) {
       div.textContent = "Player 1 won!";
       player2.action = "loose";
       audios.gameover.play();
+      // Hier NICHT sofort gameISOver aufrufen oder das Spiel stoppen.
+      // Stattdessen nach einer bestimmten Zeit, die länger als die Lose-Animation dauert, gameISOver aufrufen:
       setTimeout(() => {
         gameISOver();
-      }, 3000);
+      }, 2000); // 2 Sekunden warten, damit die Lose-Animation sichtbar ist
     }
 }
 // Aktion zurücksetzen
@@ -984,30 +1002,31 @@ function initGame() {
 let lastSpriteUpdateTime = 0;
 let isPaused = true;
 let gameOver = false;
-
 function gameLoop(currentTime) {
-  if (!isPaused && !gameOver) {
+  // Entferne hier die Prüfung auf !gameOver, damit die Lose-Animation noch abgespielt werden kann.
+  if (!isPaused) {
     // 1. Canvas löschen
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // 2. Hintergrund zeichnen
     drawBackground();
 
-    // 3. Animationen aktualisieren
+    // 3. Animationen aktualisieren (Frames etc.)
     updateAnimationFrames(currentTime);
 
     // 4. Spieleraktionen und Bewegungen ausführen
     update();
-
 
     // 6. Spieler zeichnen
     drawPlayer(player1);
     drawPlayer(player2);
     debugPlayer(player1);
     debugPlayer(player2);
-    drawHitbox(player1.defenderHitbox, "blue"); // Defender-Hitbox in Blau
+
+    // Hitboxen nur für Debug
+    drawHitbox(player1.defenderHitbox, "blue");
     drawHitbox(player2.defenderHitbox, "blue");
-    drawHitbox(player1.attackHitbox, "red");    // Attack-Hitbox in Rot
+    drawHitbox(player1.attackHitbox, "red");
     drawHitbox(player2.attackHitbox, "red");
 
     // 9. Gesundheitsbalken und Statusanzeigen aktualisieren
@@ -1017,6 +1036,7 @@ function gameLoop(currentTime) {
   // 10. Nächsten Frame anfordern
   requestAnimationFrame(gameLoop);
 }
+
 initGame();
 requestAnimationFrame(gameLoop);
 

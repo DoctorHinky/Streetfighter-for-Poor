@@ -33,17 +33,29 @@ menu.innerHTML = /* html */ `
 <div id="character8" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 `;
 }
-
+// Musikzuordnung für die Karten
 const mapMusic = {
-    map1: "",
-    map2: "",
-    map3: "",
-    map4: "",
-    map5: "",
-    map6: "",
-    map7: "",
-    map8: ""
+    map1: "../assets/sounds/BGMusik/Arp & Synth Music/The Stalker.mp3",
+    map2: "../assets/sounds/BGMusik/Arp & Synth Music/Club Hell.mp3",
+    map3: "../assets/sounds/BGMusik/Arp & Synth Music/Paralax City.mp3",
+    map4: "../assets/sounds/BGMusik/Arp & Synth Music/Crystal Mountains.mp3",
+    map5: "../assets/sounds/BGMusik/Arp & Synth Music/Android Dance.mp3",
+    map6: "../assets/sounds/BGMusik/Arp & Synth Music/Leather Jacket.mp3",
+    map7: "../assets/sounds/BGMusik/Arp & Synth Music/Club Heaven.mp3",
+    map8: "../assets/sounds/BGMusik/Arp & Synth Music/Commerce Gloss.mp3",
 }
+let currentMapMusic = null;
+function playMapMusic(url) {
+    if (currentMapMusic) {
+        currentMapMusic.pause();
+        currentMapMusic.currentTime = 0;
+    }
+    currentMapMusic = new Audio(url);
+    currentMapMusic.volume = 0.3;
+    currentMapMusic.loop = true;
+    currentMapMusic.play().catch(err => console.error("Konnte Musik nicht abspielen: ", err));
+}
+
 // das erstellen der CharakterClass um nicht für jede ein objekt zu machen
 class Character {
     constructor(name, url) {
@@ -159,7 +171,6 @@ function initMapMenu() {
         menu.classList.remove('menu');
         menu.classList.add('mapMenu');
 
-        // beachte das /* hmtl */ wieder mal um Syntaxhighlighting zu aktivieren
         menu.innerHTML = /* html */ ` 
         <div id="showCaseContainer">
             <div id="P1Head" class="playerHead">P1</div>
@@ -187,32 +198,42 @@ function initMapMenu() {
         setBackground('map6', 'url(../assets/background/postapocalypse4.png)');
         setBackground('map7', 'url(../assets/background/Rusted_4.webp)');
         setBackground('map8', 'url(../assets/background/slums.png)');
+
         document.getElementById('P1Head').style.background = SelectedP1.style.background;
         document.getElementById('P2Head').style.background = SelectedP2.style.background;
         
-        
         menu.addEventListener('click', (e) => {
-
             const target = e.target.closest('.map');
-            if (!target) return; // wenn das target nicht die klasse map hat, dann wird die funktion abgebrochen
+            if (!target) return; 
             if(!target.classList.contains('map') && !target.classList.contains('playerHead')) return;
             Clicksound.play().catch(err => console.error("konnte nicht abspielen: ", err));
-                p1MapConfirm = false;
-                p2MapConfirm = false;
-                document.getElementById('P1Head').style.boxShadow = '0px 0px 10px 5px #fff';
-                document.getElementById('P2Head').style.boxShadow = '0px 0px 10px 5px #fff';
-                document.getElementById('P1Head').classList.remove('confirmed');
-                document.getElementById('P2Head').classList.remove('confirmed');
-                SelectedMap = target;
-                target.classList.add('selected');
+
+            p1MapConfirm = false;
+            p2MapConfirm = false;
+            document.getElementById('P1Head').style.boxShadow = '0px 0px 10px 5px #fff';
+            document.getElementById('P2Head').style.boxShadow = '0px 0px 10px 5px #fff';
+            document.getElementById('P1Head').classList.remove('confirmed');
+            document.getElementById('P2Head').classList.remove('confirmed');
+            
+            SelectedMap = target;
+            target.classList.add('selected');
+
+            document.getElementById('showCase').style.background = target.style.background;
+            document.getElementById('showCase').textContent = target.textContent;
     
-                document.getElementById('showCase').style.background = target.style.background;
-                document.getElementById('showCase').textContent = target.textContent;
-    
-                document.body.style.background = target.style.background;
-                const background = target.style.background;
-                mapUrl = background.match(/url\((['"]?)(.*?)\1\)/)?.[2] || null; // regex um die url aus dem background zu extrahieren
+            document.body.style.background = target.style.background;
+            const background = target.style.background;
+            mapUrl = background.match(/url\((['"]?)(.*?)\1\)/)?.[2] || null;
+            
+            // Neue Musik abspielen, falls vorhanden
+            if (mapMusic[SelectedMap.id]) {
+                // Menü-Musik stoppen
+                menuMusic.pause();
+                menuMusic.currentTime = 0;
                 
+                // Map-Musik abspielen
+                playMapMusic(mapMusic[SelectedMap.id]);
+            }
         });
     
         menu.addEventListener('click', (e) => {
@@ -232,6 +253,7 @@ function initMapMenu() {
                 document.getElementById('P2Head').classList.add('confirmed');
                 p2MapConfirm = true;
             }
+
             if(SelectedMap && p2MapConfirm && p1MapConfirm){
                 document.getElementById('showCase').style.transition = 'all 2s';
                 document.getElementById('showCase').style.boxShadow = '0 0 10px 5px #0f0';
@@ -250,6 +272,11 @@ function gameCountdown() {
         sessionStorage.setItem('SelectedP2', SelectedP2.id);
         sessionStorage.setItem('SelectedMap', mapUrl);
 
-    window.location.href = '../index.html';  // das ist die verlinkung zum spiel
+        // Gewählte Musik mit abspeichern
+        if (SelectedMap && mapMusic[SelectedMap.id]) {
+            sessionStorage.setItem('SelectedMusic', mapMusic[SelectedMap.id]);
+        }
+
+        window.location.href = '../index.html';  // das ist die verlinkung zum spiel
     }, 1000);           
 }
