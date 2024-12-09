@@ -354,7 +354,7 @@ class Player {
     this.width = 200;
     this.height = 200;
     this.action = "idle";
-    this.speed = 5;
+    this.speed = 3;
     this.velocityY = 0;
     this.isJumping = false;
     this.health = 300;
