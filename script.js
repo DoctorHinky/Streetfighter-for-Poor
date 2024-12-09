@@ -913,7 +913,7 @@ function updateHealth() {
       // Stattdessen nach einer bestimmten Zeit, die länger als die Lose-Animation dauert, gameISOver aufrufen:
       setTimeout(() => {
         gameISOver();
-      }, 2000); // 2 Sekunden warten, damit die Lose-Animation sichtbar ist
+      }, 1000); // 2 Sekunden warten, damit die Lose-Animation sichtbar ist
     }
     if (player2.health <= 0) {
       div.textContent = "Player 1 won!";
@@ -923,7 +923,7 @@ function updateHealth() {
       // Stattdessen nach einer bestimmten Zeit, die länger als die Lose-Animation dauert, gameISOver aufrufen:
       setTimeout(() => {
         gameISOver();
-      }, 2000); // 2 Sekunden warten, damit die Lose-Animation sichtbar ist
+      }, 1000); // 2 Sekunden warten, damit die Lose-Animation sichtbar ist
     }
 }
 // Aktion zurücksetzen
@@ -1020,14 +1020,14 @@ function gameLoop(currentTime) {
     // 6. Spieler zeichnen
     drawPlayer(player1);
     drawPlayer(player2);
-    debugPlayer(player1);
-    debugPlayer(player2);
+    // debugPlayer(player1);
+    // debugPlayer(player2);
 
     // Hitboxen nur für Debug
-    drawHitbox(player1.defenderHitbox, "blue");
-    drawHitbox(player2.defenderHitbox, "blue");
-    drawHitbox(player1.attackHitbox, "red");
-    drawHitbox(player2.attackHitbox, "red");
+    // drawHitbox(player1.defenderHitbox, "blue");
+    // drawHitbox(player2.defenderHitbox, "blue");
+    // drawHitbox(player1.attackHitbox, "red");
+    // drawHitbox(player2.attackHitbox, "red");
 
     // 9. Gesundheitsbalken und Statusanzeigen aktualisieren
     updateHealth();
