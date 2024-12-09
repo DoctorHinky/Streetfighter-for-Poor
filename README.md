@@ -1,15 +1,22 @@
-# Streetfighter-for-Poor
-Einfaches Streetfighter game
+# Streetfighter for Poor
 
+Dies ist ein Kampfspiel-Projekt, das sich noch in der Entwicklung befindet, bei dem Spieler mit animierten Charakteren gegeneinander kämpfen können. Das Projekt verwendet HTML, CSS und JavaScript (mit einem Fokus auf Spielmechaniken wie Animationen, Hitboxes, Spieleraktionen und Kollisionserkennung). Es ist ein kostenloses, Open-Source-Projekt, das kontinuierlich mit neuen Funktionen und Verbesserungen aktualisiert wird.
 
-## Todo liste:
+## Funktionen
 
--sprite fix for bruteArms and stun battingGirl M *
--Combat Sounds add M *
--Menu Sounds integration N
--Stage Sounds Add M/N
--voiceover add N check *
--winning screen N *
--fight start message N check 
--hitbox positioning and attack balancing M
--Dokumentation
+- **Charakter-Animationen**: Integrierte Animationen für Idle, Angriff, Block und Sprung.
+- **Hitboxes**: Präzise Hitbox-Logik für Kollisionen während der Angriffe und Bewegungen.
+- **Soundeffekte**: Klickgeräusche, Hintergrundmusik und verschiedene In-Game-Sounds (wie Game Over und Treffer-Effekte).
+- **Menü und UI**: Ein vollständig funktionierendes Menüsystem mit Pausenbildschirm, Gesundheitsanzeige und Game Over-Bildschirm.
+- **Timer und Pausen**: Ein Timer für jede Runde, der während des Spiels pausiert werden kann.
+- **Hintergrundmusik**: Dynamische Hintergrundmusik für verschiedene Phasen und das Menü.
+- **Spieler-Gesundheit**: Ein System zur Verfolgung und Anzeige der Spieler-Gesundheit während des Spiels.
+
+## Installation
+
+Um das Spiel lokal auszuführen:
+
+1. Klone das Repository:
+
+```bash
+git clone https://github.com/DoctorHinky/Streetfighter-for-Poor.git

@@ -530,15 +530,6 @@ function updateAnimationFrames(currentTime) {
   updateFrame(player2);
 }
 
-
-
-
-
-
-
-
-
-
 const keys = {};
 window.addEventListener("keydown", (e) => {
   keys[e.key] = true;
@@ -741,12 +732,6 @@ function triggerAttack(player, attackType) {
   }, animationDuration);
 }
 
-
-
-
-
-
-
 function resolveVerticalOverlap(player1, player2) {
   const overlapMargin = 150; // Sicherheitsabstand
 
@@ -882,12 +867,6 @@ function handleAnimations() {
     200
   );
 }
-
-
-
-
-
-
 // Hitbox zeichnen (Debugging)
 
 
@@ -914,13 +893,19 @@ function updateHealth() {
 
     if(player1.health <= 0){
       div.textContent = "Player 2 won!";
+      player1.action = "loose";
       audios.gameover.play();
-      gameISOver();
+      setTimeout(() => {
+        gameISOver();
+      }, 3000);
     }
     if(player2.health <= 0){
       div.textContent = "Player 1 won!";
+      player2.action = "loose";
       audios.gameover.play();
-      gameISOver();
+      setTimeout(() => {
+        gameISOver();
+      }, 3000);
     }
 }
 // Aktion zurücksetzen

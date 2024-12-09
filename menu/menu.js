@@ -2,8 +2,16 @@ console.log("menu.js loaded");
 const menu = document.querySelector('main');
 const h1 = document.querySelector('h1');
 
-// confirm variablen, diese werden auf true gesetzt, wenn der Spieler seine Auswahl bestätigt
 
+// confirm variablen, diese werden auf true gesetzt, wenn der Spieler seine Auswahl bestätigt
+const menuMusic = new Audio('.././assets/sounds/BGMusik/Arp & Synth Music/Menu.mp3');
+menuMusic.volume = 0.3;
+menuMusic.loop = true;
+
+document.addEventListener('DOMContentLoaded', () => {
+    menuMusic.play().catch(err => console.error("konnte nicht abspielen: ", err));
+}
+);
 let p1MapConfirm = false;
 let p2MapConfirm = false;
 let SelectedP1 = null;
@@ -24,6 +32,17 @@ menu.innerHTML = /* html */ `
 <div id="character7" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 <div id="character8" class="character"><p class="playerName"></p><p>Coming Soon</p></div>
 `;
+}
+
+const mapMusic = {
+    map1: "",
+    map2: "",
+    map3: "",
+    map4: "",
+    map5: "",
+    map6: "",
+    map7: "",
+    map8: ""
 }
 // das erstellen der CharakterClass um nicht für jede ein objekt zu machen
 class Character {
