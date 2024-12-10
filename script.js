@@ -1104,6 +1104,6 @@ document.getElementById('game-container').addEventListener('click', (e) => {
     location.href = 'game.html'; // da es statisch is wird das spiel neu gestarten / not the best way
   }else if (e.target.id === "quit"){
     console.log("i am quitting");
-    window.location.href = "loading.html"
+    window.location.href = "./index.html"
   }
 });
